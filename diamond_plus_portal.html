@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Diamond Plus • Reporting Portal</title>
+<style>
+:root {
+  --brand: #5C2450;
+  --brand-light: #7a3a6c;
+  --brand-dark: #3e1836;
+  --accent: #e6a817;
+  --success: #22c55e;
+  --warning: #f59e0b;
+  --danger: #ef4444;
+  --bg: #f4f5f7;
+  --card: #ffffff;
+  --text: #1e1e2f;
+  --text-muted: #6b7280;
+  --border: #e5e7eb;
+  --sidebar-w: 260px;
+  --radius: 12px;
+}
+[data-theme="dark"] {
+  --bg: #0f1117;
+  --card: #1a1c25;
+  --text: #e4e4e7;
+  --text-muted: #9ca3af;
+  --border: #2d2f3a;
+  --brand-light: #9b6490;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.6;
+  zoom: 1;
+  min-height: 100vh;
+  display: flex;
+}
+/* SIDEBAR */
+.sidebar {
+  width: var(--sidebar-w);
+  background: linear-gradient(180deg, var(--brand-dark) 0%, var(--brand) 100%);
+  color: #fff;
+  position: fixed;
+  top: 0; left: 0;
+  height: 100vh;
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  transition: transform .3s ease;
+  overflow-y: auto;
+}
+.sidebar-logo { display: block; text-decoration: none; }
+        .sidebar-logo img { width: 100%; max-width: 200px; }
+        .sidebar-logo:hover { opacity: 0.85; }
+
+
+.sidebar-nav { padding: 16px 0; flex: 1; }
+.sidebar-nav a {
+  display: flex; align-items: center; gap: 12px;
+  padding: 11px 24px;
+  color: rgba(255,255,255,.75);
+  text-decoration: none;
+  font-size: 13.5px;
+  font-weight: 500;
+  border-left: 3px solid transparent;
+  transition: all .2s;
+}
+.sidebar-nav a:hover, .sidebar-nav a.active {
+  background: rgba(255,255,255,.08);
+  color: #fff;
+  border-left-color: var(--accent);
+}
+.sidebar-nav a .nav-icon { width: 20px; text-align: center; flex-shrink: 0; font-size: 15px; }
+.sidebar-footer {
+  padding: 18px 24px;
+  border-top: 1px solid rgba(255,255,255,.12);
+  font-size: 11px; opacity: .5;
+}
+/* HAMBURGER */
+.hamburger {
+  display: none;
+  position: fixed;
+  top: 14px; left: 14px;
+  z-index: 200;
+  background: var(--brand);
+  border: none;
+  color: #fff;
+  width: 42px; height: 42px;
+  border-radius: 10px;
+  cursor: pointer;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 12px rgba(0,0,0,.25);
+}
+.hamburger svg { width: 22px; height: 22px; }
+.overlay {
+  display: none;
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,.5);
+  z-index: 90;
+}
+/* MAIN */
+.main {
+  flex: 1;
+  margin-left: var(--sidebar-w);
+  padding: 32px 40px;
+  max-width: 1280px;
+}
+/* HEADER */
+.header {
+  margin-bottom: 32px;
+}
+.header h1 { font-size: 26px; font-weight: 700; color: var(--brand); }
+[data-theme="dark"] .header h1 { color: var(--brand-light); }
+.header .period {
+  font-size: 14px; color: var(--text-muted);
+  margin-top: 4px;
+}
+.header-row { display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 12px; }
+.theme-toggle {
+  background: var(--card);
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 8px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 13px;
+  display: flex; align-items: center; gap: 6px;
+}
+/* KPI CARDS */
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 18px;
+  margin-bottom: 32px;
+}
+.kpi-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 22px 24px;
+  position: relative;
+  overflow: hidden;
+}
+.kpi-card::before {
+  content: '';
+  position: absolute; top: 0; left: 0;
+  width: 4px; height: 100%;
+}
+.kpi-card.purple::before { background: var(--brand); }
+.kpi-card.gold::before { background: var(--accent); }
+.kpi-card.red::before { background: var(--danger); }
+.kpi-card.green::before { background: var(--success); }
+.kpi-card.blue::before { background: #3b82f6; }
+.kpi-label { font-size: 12px; color: var(--text-muted); text-transform: uppercase; letter-spacing: .7px; font-weight: 600; }
+.kpi-value { font-size: 32px; font-weight: 800; margin: 6px 0 2px; }
+.kpi-sub { font-size: 12.5px; color: var(--text-muted); }
+/* SECTION */
+.section {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 28px;
+  margin-bottom: 24px;
+}
+.section-title {
+  font-size: 17px;
+  font-weight: 700;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+/* DASHBOARD CARDS */
+.cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: 24px;
+  margin-bottom: 32px;
+}
+.dash-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  transition: transform .25s ease, box-shadow .25s ease;
+  display: flex;
+  flex-direction: column;
+  text-decoration: none;
+  color: inherit;
+}
+.dash-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 32px rgba(92,36,80,.15);
+}
+.dash-card-accent {
+  height: 3px;
+  background: linear-gradient(90deg, var(--brand), var(--brand-light), var(--accent));
+  transition: height .25s ease;
+}
+.dash-card:hover .dash-card-accent {
+  height: 5px;
+}
+.dash-card-body {
+  padding: 28px 28px 24px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+.dash-card-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  margin-bottom: 14px;
+}
+.dash-card-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, var(--brand), var(--brand-light));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  flex-shrink: 0;
+  box-shadow: 0 2px 8px rgba(92,36,80,.25);
+}
+.dash-card-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text);
+  line-height: 1.3;
+  margin-top: 2px;
+}
+.dash-card-desc {
+  font-size: 14px;
+  line-height: 1.65;
+  color: var(--text-muted);
+  margin-bottom: 18px;
+  flex: 1;
+}
+.dash-card-stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 22px;
+}
+.stat-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  background: var(--bg);
+  color: var(--text-muted);
+  border: 1px solid var(--border);
+  white-space: nowrap;
+}
+.stat-badge .dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.dot.green { background: #22c55e; }
+.dot.blue { background: #3b82f6; }
+.dot.amber { background: #f59e0b; }
+.dot.red { background: #ef4444; }
+.dot.purple { background: var(--brand); }
+.card-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 24px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, var(--brand), var(--brand-light));
+  color: #fff;
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: all .2s;
+  border: none;
+  cursor: pointer;
+  letter-spacing: .2px;
+}
+.card-btn:hover {
+  filter: brightness(1.15);
+  box-shadow: 0 4px 16px rgba(92,36,80,.25);
+}
+.card-btn .arrow {
+  transition: transform .2s;
+  font-size: 16px;
+}
+.dash-card:hover .card-btn .arrow {
+  transform: translateX(3px);
+}
+/* STATUS */
+.status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  background: rgba(34,197,94,.1);
+  color: #16a34a;
+  border: 1px solid rgba(34,197,94,.2);
+}
+[data-theme="dark"] .status-pill {
+  background: rgba(34,197,94,.15);
+  color: #4ade80;
+}
+.status-dot {
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  background: #22c55e;
+  animation: pulse-dot 2s ease-in-out infinite;
+}
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; }
+  50% { opacity: .4; }
+}
+/* FOOTER */
+.portal-footer {
+  text-align: center;
+  padding: 24px 0 12px;
+  font-size: 12px;
+  color: var(--text-muted);
+}
+/* RESPONSIVE */
+@media (max-width: 900px) {
+  .sidebar { transform: translateX(-100%); }
+  .sidebar.open { transform: translateX(0); }
+  .hamburger { display: flex; }
+  .overlay.show { display: block; }
+  .main { margin-left: 0; padding: 24px 18px; padding-top: 68px; }
+  .cards-grid { grid-template-columns: 1fr; }
+}
+@media (max-width: 600px) {
+  .kpi-grid { grid-template-columns: 1fr; }
+  body { zoom: 1; }
+}
+/* PRINT */
+@media print {
+  .sidebar, .hamburger, .overlay, .theme-toggle { display: none !important; }
+  .main { margin-left: 0; padding: 20px; }
+  .section { break-inside: avoid; }
+}
+        @media (max-width: 900px) {
+        }
+    </style>
+</head>
+<body>
+<!-- HAMBURGER -->
+<button class="hamburger" onclick="toggleSidebar()" aria-label="Menu">
+  <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+</button>
+<div class="overlay" onclick="toggleSidebar()"></div>
+
+<!-- SIDEBAR -->
+<aside class="sidebar" id="sidebar">
+  <a href="https://rkonfal.github.io/diamond-plus-portal/" class="sidebar-logo" title="Zpět na portál">
+    <img src="https://raw.githubusercontent.com/rkonfal/diamond-plus-portal/main/sidebar-logo.png" alt="Diamond Plus" style="width: 100%; max-width: 200px; padding: 16px 20px;">
+</a>
+  <nav class="sidebar-nav">
+    <a href="https://rkonfal.github.io/diamond-plus-portal/" class="active">
+      <span class="nav-icon">🏠</span>
+      Portál
+    </a>
+    <a href="https://rkonfal.github.io/diamond-plus-report/">
+      <span class="nav-icon">💎</span>
+      Finanční Dashboard
+    </a>
+    <a href="https://rkonfal.github.io/4px-obalovy-material/">
+      <span class="nav-icon">📦</span>
+      Obalový materiál
+    </a>
+    <a href="https://rkonfal.github.io/4px-kpi-dashboard/">
+      <span class="nav-icon">📊</span>
+      Delivery KPI
+    </a>
+    <a href="https://rkonfal.github.io/4px-carriers/">
+      <span class="nav-icon">🚚</span>
+      Přepravci
+    </a>
+    <a href="https://rkonfal.github.io/eshop-dashboard/">
+      <span class="nav-icon">🛒</span>
+      E-shop
+    </a>
+  </nav>
+  <div class="sidebar-footer">
+    Diamond Plus s.r.o.<br>
+    Reporting Portal
+  </div>
+</aside>
+
+<!-- MAIN -->
+<div class="main">
+  <!-- HEADER -->
+  <div class="header">
+    <div class="header-row">
+      <div>
+        <h1>💎 Diamond Plus — Reporting Portal</h1>
+        <div class="period">Přehled reportů a dashboardů &nbsp;|&nbsp; Diamond Plus s.r.o. / Království TianDe</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:12px;">
+        <div class="status-pill">
+          <div class="status-dot"></div>
+          Systémy aktivní
+        </div>
+        <button class="theme-toggle" onclick="toggleTheme()">
+          <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
+          Tmavý režim
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- KPI CARDS -->
+  <div class="kpi-grid">
+    <div class="kpi-card green">
+      <div class="kpi-label">Tržby 3/2026</div>
+      <div class="kpi-value">14,5M Kč</div>
+      <div class="kpi-sub">📈 Konsolidované tržby</div>
+    </div>
+    <div class="kpi-card blue">
+      <div class="kpi-label">Čistý zisk</div>
+      <div class="kpi-value">902 tis. Kč</div>
+      <div class="kpi-sub">💰 Za období březen 2026</div>
+    </div>
+    <div class="kpi-card gold">
+      <div class="kpi-label">Zásilek týdně</div>
+      <div class="kpi-value">2 662</div>
+      <div class="kpi-sub">📦 Průměrný týdenní objem</div>
+    </div>
+    <div class="kpi-card purple">
+      <div class="kpi-label">KPI březen</div>
+      <div class="kpi-value">100 %</div>
+      <div class="kpi-sub">✅ Plnění SLA cílů</div>
+    </div>
+  </div>
+
+  <!-- DASHBOARDS SECTION -->
+  <div class="section-title">📋 Dostupné dashboardy</div>
+
+  <div class="cards-grid">
+
+    <!-- Card 1: Finanční Dashboard -->
+    <div class="dash-card">
+      <div class="dash-card-accent"></div>
+      <div class="dash-card-body">
+        <div class="dash-card-header">
+          <div class="dash-card-icon">💎</div>
+          <div class="dash-card-title">Finanční Dashboard</div>
+        </div>
+        <div class="dash-card-desc">
+          Konsolidované hospodaření Diamond Plus s.r.o. za období 2025–2026. Výkaz zisků a ztrát, účetní deník, grafy.
+        </div>
+        <div class="dash-card-stats">
+          <span class="stat-badge"><span class="dot green"></span>Tržby 14,5M Kč</span>
+          <span class="stat-badge"><span class="dot blue"></span>Zisk 902 tis. Kč</span>
+          <span class="stat-badge"><span class="dot purple"></span>4 období</span>
+        </div>
+        <a href="https://rkonfal.github.io/diamond-plus-report/" target="_blank" class="card-btn">
+          Otevřít report <span class="arrow">→</span>
+        </a>
+      </div>
+    </div>
+
+    <!-- Card 2: Obalový materiál -->
+    <div class="dash-card">
+      <div class="dash-card-accent"></div>
+      <div class="dash-card-body">
+        <div class="dash-card-header">
+          <div class="dash-card-icon">📦</div>
+          <div class="dash-card-title">Spotřeba obalového materiálu</div>
+        </div>
+        <div class="dash-card-desc">
+          Týdenní přehledy spotřeby obalů od 4PX. Trendy zásob, varování, rozložení velikostí.
+        </div>
+        <div class="dash-card-stats">
+          <span class="stat-badge"><span class="dot blue"></span>18 635 zásilek celkem</span>
+          <span class="stat-badge"><span class="dot green"></span>7 týdnů</span>
+          <span class="stat-badge"><span class="dot red"></span>Kritický stav M krabic</span>
+        </div>
+        <a href="https://rkonfal.github.io/4px-obalovy-material/" target="_blank" class="card-btn">
+          Otevřít report <span class="arrow">→</span>
+        </a>
+      </div>
+    </div>
+
+    <!-- Card 3: 4PX Delivery KPI -->
+    <div class="dash-card">
+      <div class="dash-card-accent"></div>
+      <div class="dash-card-body">
+        <div class="dash-card-header">
+          <div class="dash-card-icon">📊</div>
+          <div class="dash-card-title">4PX Delivery KPI</div>
+        </div>
+        <div class="dash-card-desc">
+          Měsíční KPI expedice a příjmu. Plnění SLA, doba zpracování, rozložení přepravců.
+        </div>
+        <div class="dash-card-stats">
+          <span class="stat-badge"><span class="dot green"></span>103 857 objednávek</span>
+          <span class="stat-badge"><span class="dot blue"></span>9 měsíců</span>
+          <span class="stat-badge"><span class="dot green"></span>100 % KPI březen</span>
+        </div>
+        <a href="https://rkonfal.github.io/4px-kpi-dashboard/" target="_blank" class="card-btn">
+          Otevřít report <span class="arrow">→</span>
+        </a>
+      </div>
+    </div>
+
+    <!-- Card 4: Přepravci -->
+    <div class="dash-card">
+      <div class="dash-card-accent"></div>
+      <div class="dash-card-body">
+        <div class="dash-card-header">
+          <div class="dash-card-icon">🚚</div>
+          <div class="dash-card-title">Analýza přepravců</div>
+        </div>
+        <div class="dash-card-desc">
+          Přehled výkonu přepravců 4PX. Podíly, SLA plnění, srovnání služeb a trendů.
+        </div>
+        <div class="dash-card-stats">
+          <span class="stat-badge"><span class="dot blue"></span>Všichni přepravci</span>
+          <span class="stat-badge"><span class="dot green"></span>9 měsíců</span>
+          <span class="stat-badge"><span class="dot purple"></span>Srovnání služeb</span>
+        </div>
+        <a href="https://rkonfal.github.io/4px-carriers/" target="_blank" class="card-btn">
+          Otevřít report <span class="arrow">→</span>
+        </a>
+      </div>
+    </div>
+
+    <!-- Card 5: E-shop -->
+    <div class="dash-card">
+      <div class="dash-card-accent"></div>
+      <div class="dash-card-body">
+        <div class="dash-card-header">
+          <div class="dash-card-icon">🛒</div>
+          <div class="dash-card-title">E-shop přehled</div>
+        </div>
+        <div class="dash-card-desc">
+          Tržby, objednávky a TOP produkty z WPJ e-shopu. Týdenní analýza a způsoby plateb.
+        </div>
+        <div class="dash-card-stats">
+          <span class="stat-badge"><span class="dot green"></span>48,1 mil. Kč</span>
+          <span class="stat-badge"><span class="dot blue"></span>33 006 objednávek</span>
+          <span class="stat-badge"><span class="dot purple"></span>Q1 2026</span>
+        </div>
+        <a href="https://rkonfal.github.io/eshop-dashboard/" target="_blank" class="card-btn">
+          Otevřít report <span class="arrow">→</span>
+        </a>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- FOOTER -->
+  <div class="portal-footer">
+    Diamond Plus s.r.o. / Království TianDe &nbsp;|&nbsp; Reporting Portal &nbsp;|&nbsp; Poslední aktualizace: duben 2026
+  </div>
+</div>
+
+<script>
+// Theme
+function toggleTheme() {
+  const d = document.documentElement;
+  d.setAttribute('data-theme', d.getAttribute('data-theme') === 'dark' ? '' : 'dark');
+}
+// Sidebar
+function toggleSidebar() {
+  document.getElementById('sidebar').classList.toggle('open');
+  document.querySelector('.overlay').classList.toggle('show');
+}
+</script>
+</body>
+</html>
