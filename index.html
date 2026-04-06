@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Diamond Plus • Reporting Portal</title>
+<title>Diamond Plus — Finanční přehled</title>
 <style>
 :root {
   --brand: #5C2450;
@@ -40,7 +40,8 @@ body {
   min-height: 100vh;
   display: flex;
 }
-/* SIDEBAR */
+
+/* ─── SIDEBAR ─── */
 .sidebar {
   width: var(--sidebar-w);
   background: linear-gradient(180deg, var(--brand-dark) 0%, var(--brand) 100%);
@@ -60,7 +61,15 @@ body {
 }
 .sidebar-logo h2 { font-size: 16px; font-weight: 700; letter-spacing: .5px; }
 .sidebar-logo span { font-size: 11px; opacity: .65; display: block; margin-top: 2px; }
-.sidebar-nav { padding: 16px 0; flex: 1; }
+.sidebar-section-label {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  opacity: .45;
+  padding: 18px 24px 6px;
+  font-weight: 700;
+}
+.sidebar-nav { padding: 8px 0; flex: 1; }
 .sidebar-nav a {
   display: flex; align-items: center; gap: 12px;
   padding: 11px 24px;
@@ -82,7 +91,13 @@ body {
   border-top: 1px solid rgba(255,255,255,.12);
   font-size: 11px; opacity: .5;
 }
-/* HAMBURGER */
+.sidebar-divider {
+  height: 1px;
+  background: rgba(255,255,255,.12);
+  margin: 6px 24px;
+}
+
+/* ─── HAMBURGER ─── */
 .hamburger {
   display: none;
   position: fixed;
@@ -105,46 +120,94 @@ body {
   background: rgba(0,0,0,.5);
   z-index: 90;
 }
-/* MAIN */
+
+/* ─── MAIN ─── */
 .main {
   flex: 1;
   margin-left: var(--sidebar-w);
-  padding: 32px 40px;
-  max-width: 1280px;
+  padding: 36px 44px;
+  max-width: 1300px;
 }
-/* HEADER */
-.header {
-  margin-bottom: 32px;
-}
-.header h1 { font-size: 26px; font-weight: 700; color: var(--brand); }
-[data-theme="dark"] .header h1 { color: var(--brand-light); }
-.header .period {
-  font-size: 14px; color: var(--text-muted);
-  margin-top: 4px;
-}
+
+/* ─── HEADER ─── */
+.header { margin-bottom: 36px; }
 .header-row { display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 12px; }
+.header h1 {
+  font-size: 28px;
+  font-weight: 800;
+  color: var(--brand);
+  letter-spacing: -.3px;
+}
+[data-theme="dark"] .header h1 { color: var(--brand-light); }
+.header-sub {
+  font-size: 14px;
+  color: var(--text-muted);
+  margin-top: 5px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.header-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(34,197,94,.1);
+  color: #16a34a;
+  border: 1px solid rgba(34,197,94,.2);
+  border-radius: 20px;
+  padding: 4px 12px;
+  font-size: 12px;
+  font-weight: 600;
+}
+[data-theme="dark"] .header-badge { background: rgba(34,197,94,.15); color: #4ade80; }
+.pulse { width: 7px; height: 7px; border-radius: 50%; background: #22c55e; animation: blink 2s ease-in-out infinite; flex-shrink: 0; }
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:.35} }
 .theme-toggle {
   background: var(--card);
   border: 1px solid var(--border);
   color: var(--text);
-  padding: 8px 14px;
-  border-radius: 8px;
+  padding: 9px 16px;
+  border-radius: 9px;
   cursor: pointer;
   font-size: 13px;
-  display: flex; align-items: center; gap: 6px;
+  display: flex; align-items: center; gap: 7px;
+  font-weight: 500;
+  transition: background .2s;
 }
-/* KPI CARDS */
+.theme-toggle:hover { background: var(--border); }
+
+/* ─── SECTION LABEL ─── */
+.block-label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 1.3px;
+  font-weight: 700;
+  color: var(--text-muted);
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.block-label::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+
+/* ─── BIG KPI CARDS ─── */
 .kpi-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
   gap: 18px;
-  margin-bottom: 32px;
+  margin-bottom: 40px;
 }
 .kpi-card {
   background: var(--card);
   border: 1px solid var(--border);
   border-radius: var(--radius);
-  padding: 22px 24px;
+  padding: 24px 26px 22px;
   position: relative;
   overflow: hidden;
 }
@@ -153,133 +216,159 @@ body {
   position: absolute; top: 0; left: 0;
   width: 4px; height: 100%;
 }
+.kpi-card.green::before  { background: var(--success); }
+.kpi-card.amber::before  { background: var(--warning); }
+.kpi-card.blue::before   { background: #3b82f6; }
 .kpi-card.purple::before { background: var(--brand); }
-.kpi-card.gold::before { background: var(--accent); }
-.kpi-card.red::before { background: var(--danger); }
-.kpi-card.green::before { background: var(--success); }
-.kpi-card.blue::before { background: #3b82f6; }
-.kpi-label { font-size: 12px; color: var(--text-muted); text-transform: uppercase; letter-spacing: .7px; font-weight: 600; }
-.kpi-value { font-size: 32px; font-weight: 800; margin: 6px 0 2px; }
-.kpi-sub { font-size: 12.5px; color: var(--text-muted); }
-/* SECTION */
-.section {
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 28px;
-  margin-bottom: 24px;
+
+.kpi-traffic {
+  position: absolute;
+  top: 16px; right: 20px;
+  font-size: 20px;
+  line-height: 1;
 }
-.section-title {
-  font-size: 17px;
+.kpi-what {
+  font-size: 10.5px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: .8px;
   font-weight: 700;
-  margin-bottom: 20px;
-  display: flex;
-  align-items: center;
-  gap: 10px;
+  margin-bottom: 4px;
 }
-/* DASHBOARD CARDS */
+.kpi-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-muted);
+  margin-bottom: 10px;
+  padding-right: 30px;
+  line-height: 1.4;
+}
+.kpi-value {
+  font-size: 32px;
+  font-weight: 900;
+  letter-spacing: -1px;
+  line-height: 1;
+  margin-bottom: 10px;
+  color: var(--text);
+}
+.kpi-delta {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 3px 10px;
+  border-radius: 12px;
+  margin-bottom: 10px;
+}
+.kpi-delta.up   { background: rgba(34,197,94,.12);  color: #15803d; }
+.kpi-delta.flat { background: rgba(59,130,246,.12); color: #1d4ed8; }
+.kpi-delta.warn { background: rgba(245,158,11,.12); color: #92400e; }
+[data-theme="dark"] .kpi-delta.up   { background: rgba(34,197,94,.18);  color: #4ade80; }
+[data-theme="dark"] .kpi-delta.flat { background: rgba(59,130,246,.18); color: #93c5fd; }
+[data-theme="dark"] .kpi-delta.warn { background: rgba(245,158,11,.18); color: #fbbf24; }
+.kpi-explain {
+  font-size: 12px;
+  color: var(--text-muted);
+  line-height: 1.55;
+}
+
+/* ─── DASHBOARD CARDS ─── */
 .cards-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
-  gap: 24px;
-  margin-bottom: 32px;
+  grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+  gap: 22px;
+  margin-bottom: 40px;
 }
 .dash-card {
   background: var(--card);
   border: 1px solid var(--border);
   border-radius: var(--radius);
   overflow: hidden;
-  transition: transform .25s ease, box-shadow .25s ease;
   display: flex;
   flex-direction: column;
-  text-decoration: none;
-  color: inherit;
+  transition: transform .25s ease, box-shadow .25s ease;
 }
 .dash-card:hover {
   transform: translateY(-4px);
-  box-shadow: 0 8px 32px rgba(92,36,80,.15);
+  box-shadow: 0 10px 36px rgba(92,36,80,.12);
 }
-.dash-card-accent {
-  height: 3px;
+.dash-card-bar {
+  height: 4px;
   background: linear-gradient(90deg, var(--brand), var(--brand-light), var(--accent));
-  transition: height .25s ease;
+  transition: height .25s;
 }
-.dash-card:hover .dash-card-accent {
-  height: 5px;
-}
+.dash-card:hover .dash-card-bar { height: 6px; }
 .dash-card-body {
-  padding: 28px 28px 24px;
+  padding: 26px 28px 24px;
   flex: 1;
   display: flex;
   flex-direction: column;
 }
-.dash-card-header {
+.dash-card-head {
   display: flex;
   align-items: flex-start;
   gap: 14px;
-  margin-bottom: 14px;
+  margin-bottom: 12px;
 }
-.dash-card-icon {
-  width: 48px;
-  height: 48px;
-  border-radius: 12px;
+.dash-icon {
+  width: 50px; height: 50px;
+  border-radius: 13px;
   background: linear-gradient(135deg, var(--brand), var(--brand-light));
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 22px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 23px;
   flex-shrink: 0;
-  box-shadow: 0 2px 8px rgba(92,36,80,.25);
+  box-shadow: 0 3px 10px rgba(92,36,80,.2);
 }
-.dash-card-title {
-  font-size: 18px;
+.dash-title {
+  font-size: 17px;
   font-weight: 700;
   color: var(--text);
   line-height: 1.3;
+}
+.dash-subtitle {
+  font-size: 12px;
+  color: var(--text-muted);
   margin-top: 2px;
 }
-.dash-card-desc {
-  font-size: 14px;
-  line-height: 1.65;
+.dash-desc {
+  font-size: 13.5px;
   color: var(--text-muted);
-  margin-bottom: 18px;
+  line-height: 1.65;
+  margin-bottom: 16px;
   flex: 1;
 }
-.dash-card-stats {
+.dash-numbers {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
-  margin-bottom: 22px;
+  gap: 7px;
+  margin-bottom: 20px;
 }
-.stat-badge {
+.num-chip {
   display: inline-flex;
   align-items: center;
-  gap: 5px;
-  padding: 5px 12px;
+  gap: 6px;
+  padding: 5px 11px;
   border-radius: 20px;
   font-size: 12px;
   font-weight: 600;
   background: var(--bg);
-  color: var(--text-muted);
+  color: var(--text);
   border: 1px solid var(--border);
   white-space: nowrap;
 }
-.stat-badge .dot {
-  width: 6px; height: 6px;
-  border-radius: 50%;
-  flex-shrink: 0;
-}
-.dot.green { background: #22c55e; }
-.dot.blue { background: #3b82f6; }
-.dot.amber { background: #f59e0b; }
-.dot.red { background: #ef4444; }
-.dot.purple { background: var(--brand); }
-.card-btn {
+.num-chip .dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+.dot.g { background: #22c55e; }
+.dot.a { background: #f59e0b; }
+.dot.r { background: #ef4444; }
+.dot.b { background: #3b82f6; }
+.dot.p { background: var(--brand); }
+.btn-detail {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
-  padding: 12px 24px;
+  padding: 12px 22px;
   border-radius: 10px;
   background: linear-gradient(135deg, var(--brand), var(--brand-light));
   color: #fff;
@@ -287,122 +376,153 @@ body {
   font-weight: 600;
   text-decoration: none;
   transition: all .2s;
-  border: none;
-  cursor: pointer;
-  letter-spacing: .2px;
+  letter-spacing: .1px;
+  align-self: flex-start;
 }
-.card-btn:hover {
-  filter: brightness(1.15);
-  box-shadow: 0 4px 16px rgba(92,36,80,.25);
+.btn-detail:hover { filter: brightness(1.12); box-shadow: 0 4px 16px rgba(92,36,80,.25); }
+.btn-detail .arr { transition: transform .2s; font-size: 15px; }
+.dash-card:hover .btn-detail .arr { transform: translateX(3px); }
+
+/* ─── ALERT CARD ─── */
+.alert-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  margin-bottom: 36px;
 }
-.card-btn .arrow {
-  transition: transform .2s;
-  font-size: 16px;
+.alert-card-bar {
+  height: 4px;
+  background: linear-gradient(90deg, var(--danger), var(--warning), var(--accent));
 }
-.dash-card:hover .card-btn .arrow {
-  transform: translateX(3px);
+.alert-card-body { padding: 26px 28px 28px; }
+.alert-head {
+  display: flex; align-items: center; gap: 14px;
+  margin-bottom: 22px;
 }
-/* STATUS */
-.status-pill {
+.alert-icon {
+  width: 50px; height: 50px;
+  border-radius: 13px;
+  background: linear-gradient(135deg, #b91c1c, #ef4444);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 23px;
+  flex-shrink: 0;
+  box-shadow: 0 3px 10px rgba(239,68,68,.25);
+}
+.alert-title { font-size: 17px; font-weight: 700; }
+.alert-subtitle { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+.alert-list { display: flex; flex-direction: column; gap: 12px; }
+.alert-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  padding: 16px 18px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--bg);
+}
+.alert-item.red {
+  border-left: 4px solid var(--danger);
+  background: rgba(239,68,68,.035);
+}
+.alert-item.amber {
+  border-left: 4px solid var(--warning);
+  background: rgba(245,158,11,.035);
+}
+[data-theme="dark"] .alert-item.red   { background: rgba(239,68,68,.08); }
+[data-theme="dark"] .alert-item.amber { background: rgba(245,158,11,.08); }
+.alert-emoji { font-size: 20px; line-height: 1; margin-top: 2px; flex-shrink: 0; }
+.alert-msg {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text);
+  line-height: 1.4;
+  margin-bottom: 4px;
+}
+.alert-detail {
+  font-size: 12.5px;
+  color: var(--text-muted);
+  line-height: 1.55;
+  margin-bottom: 6px;
+}
+.alert-cta {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  padding: 6px 14px;
-  border-radius: 20px;
+  gap: 5px;
   font-size: 12px;
-  font-weight: 600;
-  background: rgba(34,197,94,.1);
-  color: #16a34a;
-  border: 1px solid rgba(34,197,94,.2);
+  font-weight: 700;
+  color: var(--brand);
+  padding: 3px 9px;
+  border-radius: 6px;
+  background: rgba(92,36,80,.07);
 }
-[data-theme="dark"] .status-pill {
-  background: rgba(34,197,94,.15);
-  color: #4ade80;
-}
-.status-dot {
-  width: 7px; height: 7px;
-  border-radius: 50%;
-  background: #22c55e;
-  animation: pulse-dot 2s ease-in-out infinite;
-}
-@keyframes pulse-dot {
-  0%, 100% { opacity: 1; }
-  50% { opacity: .4; }
-}
-/* FOOTER */
+[data-theme="dark"] .alert-cta { color: var(--brand-light); background: rgba(155,100,144,.15); }
+
+/* ─── FOOTER ─── */
 .portal-footer {
   text-align: center;
-  padding: 24px 0 12px;
+  padding: 24px 0 14px;
   font-size: 12px;
   color: var(--text-muted);
+  border-top: 1px solid var(--border);
 }
-/* RESPONSIVE */
+
+/* ─── RESPONSIVE ─── */
 @media (max-width: 900px) {
   .sidebar { transform: translateX(-100%); }
   .sidebar.open { transform: translateX(0); }
   .hamburger { display: flex; }
   .overlay.show { display: block; }
-  .main { margin-left: 0; padding: 24px 18px; padding-top: 68px; }
+  .main { margin-left: 0; padding: 24px 18px; padding-top: 70px; }
   .cards-grid { grid-template-columns: 1fr; }
+  .kpi-grid { grid-template-columns: repeat(2, 1fr); }
 }
-@media (max-width: 600px) {
+@media (max-width: 560px) {
   .kpi-grid { grid-template-columns: 1fr; }
-  body { zoom: 1; }
+  .kpi-value { font-size: 28px; }
+  .main { padding: 16px 14px; padding-top: 68px; }
 }
-/* PRINT */
 @media print {
   .sidebar, .hamburger, .overlay, .theme-toggle { display: none !important; }
   .main { margin-left: 0; padding: 20px; }
-  .section { break-inside: avoid; }
 }
-
-        
-        
-        
-        @media (max-width: 900px) {
-            
-            
-        }
-    </style>
+</style>
 </head>
 <body>
+
 <!-- HAMBURGER -->
 <button class="hamburger" onclick="toggleSidebar()" aria-label="Menu">
   <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
 </button>
-    
 <div class="overlay" onclick="toggleSidebar()"></div>
 
 <!-- SIDEBAR -->
 <aside class="sidebar" id="sidebar">
   <div class="sidebar-logo">
-    <h2>DIAMOND PLUS</h2>
-    <span>Království TianDe</span>
+    <h2>💎 DIAMOND PLUS</h2>
+    <span>Finanční přehled · Q1 2026</span>
   </div>
   <nav class="sidebar-nav">
+    <div class="sidebar-section-label">Hlavní přehled</div>
     <a href="https://rkonfal.github.io/diamond-plus-portal/" class="active">
-      <span class="nav-icon">🏠</span>
-      Portál
+      <span class="nav-icon">🏠</span> Finanční přehled
     </a>
+    <div class="sidebar-divider"></div>
+    <div class="sidebar-section-label">Detailní reporty</div>
     <a href="https://rkonfal.github.io/diamond-plus-report/">
-      <span class="nav-icon">💎</span>
-      Finanční Dashboard
+      <span class="nav-icon">💰</span> Hospodaření firmy
     </a>
     <a href="https://rkonfal.github.io/4px-obalovy-material/">
-      <span class="nav-icon">📦</span>
-      Obalový materiál
+      <span class="nav-icon">📦</span> Spotřeba obalů
     </a>
     <a href="https://rkonfal.github.io/4px-kpi-dashboard/">
-      <span class="nav-icon">📊</span>
-      Delivery KPI
+      <span class="nav-icon">📊</span> Rychlost expedice
     </a>
     <a href="https://rkonfal.github.io/4px-carriers/">
-      <span class="nav-icon">🚚</span>
-      Přepravci
+      <span class="nav-icon">🚚</span> Náklady na přepravu
     </a>
     <a href="https://rkonfal.github.io/eshop-dashboard/">
-      <span class="nav-icon">🛒</span>
-      E-shop
+      <span class="nav-icon">🛒</span> E-shop prodeje
     </a>
   </nav>
   <div class="sidebar-footer">
@@ -411,185 +531,274 @@ body {
   </div>
 </aside>
 
-<!-- MAIN -->
+<!-- MAIN CONTENT -->
 <div class="main">
+
   <!-- HEADER -->
   <div class="header">
     <div class="header-row">
       <div>
-        <h1>💎 Diamond Plus — Reporting Portal</h1>
-        <div class="period">Přehled reportů a dashboardů &nbsp;|&nbsp; Diamond Plus s.r.o. / Království TianDe</div>
-      </div>
-      <div style="display:flex;align-items:center;gap:12px;">
-        <div class="status-pill">
-          <div class="status-dot"></div>
-          Systémy aktivní
+        <h1>💎 Diamond Plus — Finanční přehled</h1>
+        <div class="header-sub">
+          <span>Manažerský dashboard · Q1 2026</span>
+          <div class="header-badge"><div class="pulse"></div> Systémy aktivní</div>
         </div>
-        <button class="theme-toggle" onclick="toggleTheme()">
-          <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
-          Tmavý režim
-        </button>
       </div>
+      <button class="theme-toggle" onclick="toggleTheme()">
+        <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
+        Tmavý režim
+      </button>
     </div>
   </div>
 
-  <!-- KPI CARDS -->
+  <!-- ═══ JAK SI VEDEME? ═══ -->
+  <div class="block-label">Jak si vedeme? &nbsp;·&nbsp; Q1 2026 celkem</div>
+
   <div class="kpi-grid">
+
     <div class="kpi-card green">
-      <div class="kpi-label">Tržby 3/2026</div>
-      <div class="kpi-value">14,5M Kč</div>
-      <div class="kpi-sub">📈 Konsolidované tržby</div>
+      <div class="kpi-traffic">🟢</div>
+      <div class="kpi-what">Tržby · Q1 2026</div>
+      <div class="kpi-name">Kolik zákazníci utratili</div>
+      <div class="kpi-value">48,1 M Kč</div>
+      <div class="kpi-delta up">↑ +5 % vs Q4 2025</div>
+      <div class="kpi-explain">Tržby rostou — lepší čtvrtletí než konec roku 2025. Dobrý signál.</div>
     </div>
+
+    <div class="kpi-card amber">
+      <div class="kpi-traffic">🟡</div>
+      <div class="kpi-what">Zisk · Q1 2026</div>
+      <div class="kpi-name">Co nám zůstane po všech nákladech</div>
+      <div class="kpi-value">2,0 M Kč</div>
+      <div class="kpi-delta warn">⚠ Nižší marže v březnu</div>
+      <div class="kpi-explain">Kurzové ztráty 1,3 M Kč stlačily březnový zisk. Neobvyklé — prověřit.</div>
+    </div>
+
     <div class="kpi-card blue">
-      <div class="kpi-label">Čistý zisk</div>
-      <div class="kpi-value">902 tis. Kč</div>
-      <div class="kpi-sub">💰 Za období březen 2026</div>
+      <div class="kpi-traffic">🟢</div>
+      <div class="kpi-what">Průměrná objednávka</div>
+      <div class="kpi-name">Kolik utratí průměrný zákazník</div>
+      <div class="kpi-value">1 457 Kč</div>
+      <div class="kpi-delta flat">→ Stabilní</div>
+      <div class="kpi-explain">Hodnota objednávky se nemění — zákazníci nekupují méně ani více.</div>
     </div>
-    <div class="kpi-card gold">
-      <div class="kpi-label">Zásilek týdně</div>
-      <div class="kpi-value">2 662</div>
-      <div class="kpi-sub">📦 Průměrný týdenní objem</div>
-    </div>
+
     <div class="kpi-card purple">
-      <div class="kpi-label">KPI březen</div>
-      <div class="kpi-value">100 %</div>
-      <div class="kpi-sub">✅ Plnění SLA cílů</div>
+      <div class="kpi-traffic">🟢</div>
+      <div class="kpi-what">Náklady na zásilku</div>
+      <div class="kpi-name">Kolik nás stojí doručit 1 balík</div>
+      <div class="kpi-value">~100 Kč/ks</div>
+      <div class="kpi-delta up">↓ Klesající trend</div>
+      <div class="kpi-explain">Čím více zásilek, tím levněji na kus. Efektivita expedice roste.</div>
     </div>
+
   </div>
 
-  <!-- DASHBOARDS SECTION -->
-  <div class="section-title">📋 Dostupné dashboardy</div>
+  <!-- ═══ DETAILNÍ PŘEHLEDY ═══ -->
+  <div class="block-label">Detailní přehledy &nbsp;·&nbsp; Klikni pro detail</div>
 
   <div class="cards-grid">
 
-    <!-- Card 1: Finanční Dashboard -->
+    <!-- 1. Hospodaření firmy -->
     <div class="dash-card">
-      <div class="dash-card-accent"></div>
+      <div class="dash-card-bar"></div>
       <div class="dash-card-body">
-        <div class="dash-card-header">
-          <div class="dash-card-icon">💎</div>
-          <div class="dash-card-title">Finanční Dashboard</div>
+        <div class="dash-card-head">
+          <div class="dash-icon">💰</div>
+          <div>
+            <div class="dash-title">Hospodaření firmy</div>
+            <div class="dash-subtitle">ABRA Flexi · Q1 2026</div>
+          </div>
         </div>
-        <div class="dash-card-desc">
-          Konsolidované hospodaření Diamond Plus s.r.o. za období 2025–2026. Výkaz zisků a ztrát, účetní deník, grafy.
+        <div class="dash-desc">
+          Kolik vyděláváme a kde utrácíme. Celkové tržby, zisk, marže a vývoj od začátku roku — bez účetního žargonu.
         </div>
-        <div class="dash-card-stats">
-          <span class="stat-badge"><span class="dot green"></span>Tržby 14,5M Kč</span>
-          <span class="stat-badge"><span class="dot blue"></span>Zisk 902 tis. Kč</span>
-          <span class="stat-badge"><span class="dot purple"></span>4 období</span>
+        <div class="dash-numbers">
+          <span class="num-chip"><span class="dot g"></span>Tržby 14,5 M Kč/měs</span>
+          <span class="num-chip"><span class="dot b"></span>Zisk 902 K v březnu</span>
+          <span class="num-chip"><span class="dot a"></span>Marže 19 %</span>
         </div>
-        <a href="https://rkonfal.github.io/diamond-plus-report/" target="_blank" class="card-btn">
-          Otevřít report <span class="arrow">→</span>
+        <a href="https://rkonfal.github.io/diamond-plus-report/" target="_blank" class="btn-detail">
+          Zobrazit detail <span class="arr">→</span>
         </a>
       </div>
     </div>
 
-    <!-- Card 2: Obalový materiál -->
+    <!-- 2. Spotřeba obalů -->
     <div class="dash-card">
-      <div class="dash-card-accent"></div>
+      <div class="dash-card-bar"></div>
       <div class="dash-card-body">
-        <div class="dash-card-header">
-          <div class="dash-card-icon">📦</div>
-          <div class="dash-card-title">Spotřeba obalového materiálu</div>
+        <div class="dash-card-head">
+          <div class="dash-icon">📦</div>
+          <div>
+            <div class="dash-title">Spotřeba obalů</div>
+            <div class="dash-subtitle">4PX sklad · týdenní data</div>
+          </div>
         </div>
-        <div class="dash-card-desc">
-          Týdenní přehledy spotřeby obalů od 4PX. Trendy zásob, varování, rozložení velikostí.
+        <div class="dash-desc">
+          Kolik krabic spotřebujeme a kdy dojdou zásoby. Přehled po velikostech M, L, XL s varováním před vyčerpáním.
         </div>
-        <div class="dash-card-stats">
-          <span class="stat-badge"><span class="dot blue"></span>18 635 zásilek celkem</span>
-          <span class="stat-badge"><span class="dot green"></span>7 týdnů</span>
-          <span class="stat-badge"><span class="dot red"></span>Kritický stav M krabic</span>
+        <div class="dash-numbers">
+          <span class="num-chip"><span class="dot b"></span>2 662 zásilek/týden</span>
+          <span class="num-chip"><span class="dot r"></span>⚠ M krabice ~8 týdnů</span>
+          <span class="num-chip"><span class="dot g"></span>L, XL v pořádku</span>
         </div>
-        <a href="https://rkonfal.github.io/4px-obalovy-material/" target="_blank" class="card-btn">
-          Otevřít report <span class="arrow">→</span>
+        <a href="https://rkonfal.github.io/4px-obalovy-material/" target="_blank" class="btn-detail">
+          Zobrazit detail <span class="arr">→</span>
         </a>
       </div>
     </div>
 
-    <!-- Card 3: 4PX Delivery KPI -->
+    <!-- 3. Rychlost expedice -->
     <div class="dash-card">
-      <div class="dash-card-accent"></div>
+      <div class="dash-card-bar"></div>
       <div class="dash-card-body">
-        <div class="dash-card-header">
-          <div class="dash-card-icon">📊</div>
-          <div class="dash-card-title">4PX Delivery KPI</div>
+        <div class="dash-card-head">
+          <div class="dash-icon">📊</div>
+          <div>
+            <div class="dash-title">Rychlost expedice</div>
+            <div class="dash-subtitle">4PX KPI · měsíční přehled</div>
+          </div>
         </div>
-        <div class="dash-card-desc">
-          Měsíční KPI expedice a příjmu. Plnění SLA, doba zpracování, rozložení přepravců.
+        <div class="dash-desc">
+          Jak rychle expedujeme objednávky zákazníkům. Plnění SLA cílů, průměrná doba zpracování a historický vývoj po měsících.
         </div>
-        <div class="dash-card-stats">
-          <span class="stat-badge"><span class="dot green"></span>103 857 objednávek</span>
-          <span class="stat-badge"><span class="dot blue"></span>9 měsíců</span>
-          <span class="stat-badge"><span class="dot green"></span>100 % KPI březen</span>
+        <div class="dash-numbers">
+          <span class="num-chip"><span class="dot g"></span>Březen 100 % KPI ✅</span>
+          <span class="num-chip"><span class="dot b"></span>Průměr 14,8 h zprac.</span>
+          <span class="num-chip"><span class="dot a"></span>Prosinec byl nejhorší</span>
         </div>
-        <a href="https://rkonfal.github.io/4px-kpi-dashboard/" target="_blank" class="card-btn">
-          Otevřít report <span class="arrow">→</span>
+        <a href="https://rkonfal.github.io/4px-kpi-dashboard/" target="_blank" class="btn-detail">
+          Zobrazit detail <span class="arr">→</span>
         </a>
       </div>
     </div>
 
-    <!-- Card 4: Přepravci -->
+    <!-- 4. Náklady na přepravu -->
     <div class="dash-card">
-      <div class="dash-card-accent"></div>
+      <div class="dash-card-bar"></div>
       <div class="dash-card-body">
-        <div class="dash-card-header">
-          <div class="dash-card-icon">🚚</div>
-          <div class="dash-card-title">Analýza přepravců</div>
+        <div class="dash-card-head">
+          <div class="dash-icon">🚚</div>
+          <div>
+            <div class="dash-title">Náklady na přepravu</div>
+            <div class="dash-subtitle">4PX přepravci · Q1 2026</div>
+          </div>
         </div>
-        <div class="dash-card-desc">
-          Přehled výkonu přepravců 4PX. Podíly, SLA plnění, srovnání služeb a trendů.
+        <div class="dash-desc">
+          Kolik platíme přepravcům za každý balík. Srovnání Česká pošta vs. Packeta — kdo je levnější a proč na výběru záleží.
         </div>
-        <div class="dash-card-stats">
-          <span class="stat-badge"><span class="dot blue"></span>Všichni přepravci</span>
-          <span class="stat-badge"><span class="dot green"></span>9 měsíců</span>
-          <span class="stat-badge"><span class="dot purple"></span>Srovnání služeb</span>
+        <div class="dash-numbers">
+          <span class="num-chip"><span class="dot g"></span>ČP 47,84 Kč/ks</span>
+          <span class="num-chip"><span class="dot r"></span>Packeta 94,83 Kč/ks</span>
+          <span class="num-chip"><span class="dot b"></span>Celkem 2,4 M Kč/Q1</span>
         </div>
-        <a href="https://rkonfal.github.io/4px-carriers/" target="_blank" class="card-btn">
-          Otevřít report <span class="arrow">→</span>
+        <a href="https://rkonfal.github.io/4px-carriers/" target="_blank" class="btn-detail">
+          Zobrazit detail <span class="arr">→</span>
         </a>
       </div>
     </div>
 
-    <!-- Card 5: E-shop -->
+    <!-- 5. E-shop prodeje -->
     <div class="dash-card">
-      <div class="dash-card-accent"></div>
+      <div class="dash-card-bar"></div>
       <div class="dash-card-body">
-        <div class="dash-card-header">
-          <div class="dash-card-icon">🛒</div>
-          <div class="dash-card-title">E-shop přehled</div>
+        <div class="dash-card-head">
+          <div class="dash-icon">🛒</div>
+          <div>
+            <div class="dash-title">E-shop prodeje</div>
+            <div class="dash-subtitle">WPJ Shop API · Q1 2026</div>
+          </div>
         </div>
-        <div class="dash-card-desc">
-          Tržby, objednávky a TOP produkty z WPJ e-shopu. Týdenní analýza a způsoby plateb.
+        <div class="dash-desc">
+          Co se prodává a kdo nakupuje. TOP produkty, počty objednávek a způsoby plateb — přehled chování zákazníků.
         </div>
-        <div class="dash-card-stats">
-          <span class="stat-badge"><span class="dot green"></span>48,1 mil. Kč</span>
-          <span class="stat-badge"><span class="dot blue"></span>33 006 objednávek</span>
-          <span class="stat-badge"><span class="dot purple"></span>Q1 2026</span>
+        <div class="dash-numbers">
+          <span class="num-chip"><span class="dot g"></span>33 K objednávek</span>
+          <span class="num-chip"><span class="dot p"></span>TOP: Fytogel Slaviton</span>
+          <span class="num-chip"><span class="dot b"></span>53 % platí online</span>
         </div>
-        <a href="https://rkonfal.github.io/eshop-dashboard/" target="_blank" class="card-btn">
-          Otevřít report <span class="arrow">→</span>
+        <a href="https://rkonfal.github.io/eshop-dashboard/" target="_blank" class="btn-detail">
+          Zobrazit detail <span class="arr">→</span>
         </a>
       </div>
     </div>
 
+  </div>
+
+  <!-- ═══ VAROVÁNÍ ═══ -->
+  <div class="block-label">Na co si dát pozor &nbsp;·&nbsp; Vyžaduje rozhodnutí</div>
+
+  <div class="alert-card">
+    <div class="alert-card-bar"></div>
+    <div class="alert-card-body">
+      <div class="alert-head">
+        <div class="alert-icon">⚠️</div>
+        <div>
+          <div class="alert-title">Aktuální varování a doporučení</div>
+          <div class="alert-subtitle">4 body, které management by měl řešit teď</div>
+        </div>
+      </div>
+      <div class="alert-list">
+
+        <div class="alert-item red">
+          <div class="alert-emoji">📦</div>
+          <div>
+            <div class="alert-msg">M krabice dojdou za ~8 týdnů — objednat!</div>
+            <div class="alert-detail">Při tempu 2 662 zásilek/týden vyčerpáme zásoby středních krabic přibližně v červnu 2026. Pokud sezóna zrychlí, může být zásoby i dřív.</div>
+            <div class="alert-cta">→ Akce: Spustit objednávku M krabic co nejdříve</div>
+          </div>
+        </div>
+
+        <div class="alert-item red">
+          <div class="alert-emoji">💸</div>
+          <div>
+            <div class="alert-msg">Kurzové ztráty 1,3 M Kč v březnu — neobvyklé, prověřit</div>
+            <div class="alert-detail">Březnový zisk byl znatelně nižší kvůli kurzovým rozdílům. Takto vysoká ztráta není standard — zjistit, jde-li o jednorázový efekt nebo opakující se riziko.</div>
+            <div class="alert-cta">→ Akce: Ověřit s účetní — přechodný, nebo strukturální problém?</div>
+          </div>
+        </div>
+
+        <div class="alert-item amber">
+          <div class="alert-emoji">🚚</div>
+          <div>
+            <div class="alert-msg">Packeta zdražila 2× (63 → 126 Kč/ks) — vyjednat lepší podmínky?</div>
+            <div class="alert-detail">Cena zásilky přes Packetu se zdvojnásobila. Česká pošta zůstala na 47,84 Kč/ks. Přesun části zásilek na ČP může ušetřit stovky tisíc Kč ročně.</div>
+            <div class="alert-cta">→ Akce: Přehodnotit mix přepravců, kontaktovat Packetu ohledně slev</div>
+          </div>
+        </div>
+
+        <div class="alert-item amber">
+          <div class="alert-emoji">📅</div>
+          <div>
+            <div class="alert-msg">Prosinec měl nejhorší KPI (91 %) — připravit se na příští sezónu</div>
+            <div class="alert-detail">V prosinci 2025 expedice nesplnila SLA cíle. Vánoční sezóna znovu přijde — bez přípravy hrozí opakování a nespokojenost zákazníků.</div>
+            <div class="alert-cta">→ Akce: Naplánovat posílení skladu nejpozději do října 2026</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
   </div>
 
   <!-- FOOTER -->
   <div class="portal-footer">
-    Diamond Plus s.r.o. / Království TianDe &nbsp;|&nbsp; Reporting Portal &nbsp;|&nbsp; Poslední aktualizace: duben 2026
+    Data aktualizována: duben 2026 &nbsp;·&nbsp; Zdroje: ABRA Flexi, WPJ Shop API, 4PX reporty &nbsp;·&nbsp; Diamond Plus s.r.o.
   </div>
-</div>
+
+</div><!-- /main -->
 
 <script>
-// Theme
 function toggleTheme() {
   const d = document.documentElement;
   d.setAttribute('data-theme', d.getAttribute('data-theme') === 'dark' ? '' : 'dark');
 }
-// Sidebar
 function toggleSidebar() {
   document.getElementById('sidebar').classList.toggle('open');
   document.querySelector('.overlay').classList.toggle('show');
+}
+if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+  document.documentElement.setAttribute('data-theme', 'dark');
 }
 </script>
 </body>
