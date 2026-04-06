@@ -1,611 +1,535 @@
 <!DOCTYPE html>
 <html lang="cs">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Diamond Plus • Reporting Portal</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --brand: #5C2450;
-            --brand-light: #7A3668;
-            --brand-dark: #3E1836;
-            --brand-glow: rgba(92, 36, 80, 0.35);
-            --accent: #D4A843;
-            --accent-light: #E8C76A;
-            --surface: #ffffff;
-            --surface-hover: #f8f5f7;
-            --surface-card: #ffffff;
-            --bg: #f3eff2;
-            --text: #1a1a1a;
-            --text-secondary: #5a5a5a;
-            --text-muted: #8a8a8a;
-            --border: rgba(92, 36, 80, 0.12);
-            --shadow: 0 1px 3px rgba(0,0,0,0.06), 0 4px 12px rgba(0,0,0,0.04);
-            --shadow-lg: 0 4px 6px rgba(0,0,0,0.04), 0 10px 40px rgba(0,0,0,0.08);
-            --shadow-glow: 0 0 0 1px rgba(92,36,80,0.08), 0 8px 40px rgba(92,36,80,0.12);
-            --radius: 16px;
-            --radius-sm: 10px;
-            --radius-xs: 6px;
-        }
-
-        @media (prefers-color-scheme: dark) {
-            :root {
-                --brand-light: #9B5A8C;
-                --surface: #1e1e24;
-                --surface-hover: #2a2a32;
-                --surface-card: #25252d;
-                --bg: #141418;
-                --text: #f0eef0;
-                --text-secondary: #b0aab0;
-                --text-muted: #706a70;
-                --border: rgba(255,255,255,0.08);
-                --shadow: 0 1px 3px rgba(0,0,0,0.3), 0 4px 12px rgba(0,0,0,0.2);
-                --shadow-lg: 0 4px 6px rgba(0,0,0,0.3), 0 10px 40px rgba(0,0,0,0.3);
-                --shadow-glow: 0 0 0 1px rgba(92,36,80,0.25), 0 8px 40px rgba(92,36,80,0.2);
-            }
-        }
-
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-
-        html {
-            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
-            background: var(--bg);
-            color: var(--text);
-            scroll-behavior: smooth;
-        }
-
-        @media (min-width: 768px) {
-            html { zoom: 0.8; }
-        }
-
-        body {
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-        }
-
-        /* ── Decorative background ── */
-        .bg-pattern {
-            position: fixed;
-            inset: 0;
-            z-index: 0;
-            overflow: hidden;
-            pointer-events: none;
-        }
-        .bg-pattern::before {
-            content: '';
-            position: absolute;
-            top: -30%;
-            right: -10%;
-            width: 700px;
-            height: 700px;
-            border-radius: 50%;
-            background: radial-gradient(circle, var(--brand-glow) 0%, transparent 70%);
-            animation: float 20s ease-in-out infinite;
-        }
-        .bg-pattern::after {
-            content: '';
-            position: absolute;
-            bottom: -20%;
-            left: -10%;
-            width: 500px;
-            height: 500px;
-            border-radius: 50%;
-            background: radial-gradient(circle, rgba(212,168,67,0.12) 0%, transparent 70%);
-            animation: float 25s ease-in-out infinite reverse;
-        }
-        @keyframes float {
-            0%, 100% { transform: translate(0, 0); }
-            50% { transform: translate(-40px, 30px); }
-        }
-
-        /* ── Header ── */
-        .header {
-            position: relative;
-            z-index: 1;
-            background: linear-gradient(135deg, var(--brand) 0%, var(--brand-dark) 100%);
-            color: #fff;
-            padding: 0;
-            overflow: hidden;
-        }
-        .header::before {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
-        }
-        .header-inner {
-            position: relative;
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 48px 32px 52px;
-        }
-        .header-top {
-            display: flex;
-            align-items: center;
-            gap: 16px;
-            margin-bottom: 20px;
-        }
-        .logo {
-            width: 56px;
-            height: 56px;
-            background: rgba(255,255,255,0.15);
-            backdrop-filter: blur(10px);
-            border-radius: 14px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 28px;
-            border: 1px solid rgba(255,255,255,0.2);
-            flex-shrink: 0;
-        }
-        .header-brand {
-            display: flex;
-            flex-direction: column;
-        }
-        .header-brand h1 {
-            font-size: 28px;
-            font-weight: 800;
-            letter-spacing: -0.5px;
-            line-height: 1.2;
-        }
-        .header-brand h1 span {
-            color: var(--accent-light);
-        }
-        .header-brand .tagline {
-            font-size: 13px;
-            font-weight: 400;
-            opacity: 0.7;
-            margin-top: 2px;
-            letter-spacing: 0.5px;
-            text-transform: uppercase;
-        }
-        .header h2 {
-            font-size: 18px;
-            font-weight: 400;
-            opacity: 0.85;
-            max-width: 500px;
-        }
-
-        /* ── Main ── */
-        .main {
-            position: relative;
-            z-index: 1;
-            flex: 1;
-            max-width: 1200px;
-            width: 100%;
-            margin: 0 auto;
-            padding: 32px;
-        }
-
-        /* ── Summary bar ── */
-        .summary-bar {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 16px;
-            margin-bottom: 40px;
-            margin-top: -36px;
-        }
-        .summary-item {
-            background: var(--surface-card);
-            border: 1px solid var(--border);
-            border-radius: var(--radius-sm);
-            padding: 20px 24px;
-            box-shadow: var(--shadow);
-            display: flex;
-            align-items: center;
-            gap: 16px;
-            transition: transform 0.2s, box-shadow 0.2s;
-        }
-        .summary-item:hover {
-            transform: translateY(-2px);
-            box-shadow: var(--shadow-lg);
-        }
-        .summary-icon {
-            width: 44px;
-            height: 44px;
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 20px;
-            flex-shrink: 0;
-        }
-        .summary-icon.green { background: rgba(34,197,94,0.12); }
-        .summary-icon.blue { background: rgba(59,130,246,0.12); }
-        .summary-icon.amber { background: rgba(245,158,11,0.12); }
-        .summary-icon.purple { background: rgba(92,36,80,0.12); }
-        .summary-value {
-            font-size: 22px;
-            font-weight: 700;
-            color: var(--text);
-            line-height: 1.2;
-        }
-        .summary-label {
-            font-size: 12px;
-            color: var(--text-muted);
-            font-weight: 500;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        /* ── Section title ── */
-        .section-title {
-            font-size: 13px;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            color: var(--text-muted);
-            margin-bottom: 20px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        .section-title::after {
-            content: '';
-            flex: 1;
-            height: 1px;
-            background: var(--border);
-        }
-
-        /* ── Cards grid ── */
-        .cards {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
-            gap: 24px;
-            margin-bottom: 48px;
-        }
-
-        .card {
-            background: var(--surface-card);
-            border: 1px solid var(--border);
-            border-radius: var(--radius);
-            overflow: hidden;
-            box-shadow: var(--shadow);
-            transition: transform 0.25s ease, box-shadow 0.25s ease;
-            display: flex;
-            flex-direction: column;
-            text-decoration: none;
-            color: inherit;
-            position: relative;
-        }
-        .card:hover {
-            transform: translateY(-4px);
-            box-shadow: var(--shadow-glow);
-        }
-        .card:hover .card-accent {
-            height: 5px;
-        }
-
-        .card-accent {
-            height: 3px;
-            background: linear-gradient(90deg, var(--brand), var(--brand-light), var(--accent));
-            transition: height 0.25s ease;
-        }
-
-        .card-body {
-            padding: 28px 28px 24px;
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .card-header {
-            display: flex;
-            align-items: flex-start;
-            gap: 14px;
-            margin-bottom: 14px;
-        }
-
-        .card-icon {
-            width: 48px;
-            height: 48px;
-            border-radius: 12px;
-            background: linear-gradient(135deg, var(--brand), var(--brand-light));
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 22px;
-            flex-shrink: 0;
-            box-shadow: 0 2px 8px var(--brand-glow);
-        }
-
-        .card-title {
-            font-size: 18px;
-            font-weight: 700;
-            color: var(--text);
-            line-height: 1.3;
-            margin-top: 2px;
-        }
-
-        .card-desc {
-            font-size: 14px;
-            line-height: 1.65;
-            color: var(--text-secondary);
-            margin-bottom: 18px;
-            flex: 1;
-        }
-
-        .card-stats {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-            margin-bottom: 22px;
-        }
-        .stat-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 5px;
-            padding: 5px 12px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 600;
-            background: var(--bg);
-            color: var(--text-secondary);
-            border: 1px solid var(--border);
-            white-space: nowrap;
-        }
-        .stat-badge .dot {
-            width: 6px;
-            height: 6px;
-            border-radius: 50%;
-            flex-shrink: 0;
-        }
-        .dot.green { background: #22c55e; }
-        .dot.blue { background: #3b82f6; }
-        .dot.amber { background: #f59e0b; }
-        .dot.red { background: #ef4444; }
-        .dot.purple { background: var(--brand); }
-
-        .card-btn {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            padding: 12px 24px;
-            border-radius: var(--radius-sm);
-            background: linear-gradient(135deg, var(--brand), var(--brand-light));
-            color: #fff;
-            font-size: 14px;
-            font-weight: 600;
-            text-decoration: none;
-            transition: all 0.2s;
-            border: none;
-            cursor: pointer;
-            letter-spacing: 0.2px;
-        }
-        .card-btn:hover {
-            filter: brightness(1.15);
-            box-shadow: 0 4px 16px var(--brand-glow);
-        }
-        .card-btn .arrow {
-            transition: transform 0.2s;
-            font-size: 16px;
-        }
-        .card:hover .card-btn .arrow {
-            transform: translateX(3px);
-        }
-
-        /* ── Footer ── */
-        .footer {
-            position: relative;
-            z-index: 1;
-            text-align: center;
-            padding: 28px 32px;
-            border-top: 1px solid var(--border);
-            color: var(--text-muted);
-            font-size: 12px;
-            letter-spacing: 0.3px;
-        }
-        .footer span {
-            opacity: 0.7;
-        }
-
-        /* ── Status indicator ── */
-        .status-pill {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            padding: 6px 14px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 600;
-            background: rgba(34,197,94,0.1);
-            color: #16a34a;
-            border: 1px solid rgba(34,197,94,0.2);
-        }
-        @media (prefers-color-scheme: dark) {
-            .status-pill {
-                background: rgba(34,197,94,0.15);
-                color: #4ade80;
-            }
-        }
-        .status-dot {
-            width: 7px;
-            height: 7px;
-            border-radius: 50%;
-            background: #22c55e;
-            animation: pulse-dot 2s ease-in-out infinite;
-        }
-        @keyframes pulse-dot {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.4; }
-        }
-
-        /* ── Responsive ── */
-        @media (max-width: 768px) {
-            .header-inner { padding: 32px 20px 40px; }
-            .header-brand h1 { font-size: 22px; }
-            .header h2 { font-size: 15px; }
-            .main { padding: 24px 16px; }
-            .cards { grid-template-columns: 1fr; gap: 16px; }
-            .summary-bar { margin-top: -24px; }
-            .card-body { padding: 22px 20px 20px; }
-        }
-
-        /* ── Entrance animations ── */
-        @keyframes fadeUp {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        .summary-item {
-            animation: fadeUp 0.5s ease forwards;
-            opacity: 0;
-        }
-        .summary-item:nth-child(1) { animation-delay: 0.1s; }
-        .summary-item:nth-child(2) { animation-delay: 0.2s; }
-        .summary-item:nth-child(3) { animation-delay: 0.3s; }
-        .summary-item:nth-child(4) { animation-delay: 0.4s; }
-
-        .card {
-            animation: fadeUp 0.5s ease forwards;
-            opacity: 0;
-        }
-        .card:nth-child(1) { animation-delay: 0.3s; }
-        .card:nth-child(2) { animation-delay: 0.45s; }
-        .card:nth-child(3) { animation-delay: 0.6s; }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Diamond Plus • Reporting Portal</title>
+<style>
+:root {
+  --brand: #5C2450;
+  --brand-light: #7a3a6c;
+  --brand-dark: #3e1836;
+  --accent: #e6a817;
+  --success: #22c55e;
+  --warning: #f59e0b;
+  --danger: #ef4444;
+  --bg: #f4f5f7;
+  --card: #ffffff;
+  --text: #1e1e2f;
+  --text-muted: #6b7280;
+  --border: #e5e7eb;
+  --sidebar-w: 260px;
+  --radius: 12px;
+}
+[data-theme="dark"] {
+  --bg: #0f1117;
+  --card: #1a1c25;
+  --text: #e4e4e7;
+  --text-muted: #9ca3af;
+  --border: #2d2f3a;
+  --brand-light: #9b6490;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.6;
+  zoom: 0.8;
+  min-height: 100vh;
+  display: flex;
+}
+/* SIDEBAR */
+.sidebar {
+  width: var(--sidebar-w);
+  background: linear-gradient(180deg, var(--brand-dark) 0%, var(--brand) 100%);
+  color: #fff;
+  position: fixed;
+  top: 0; left: 0;
+  height: 100vh;
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  transition: transform .3s ease;
+  overflow-y: auto;
+}
+.sidebar-logo {
+  padding: 28px 24px 20px;
+  border-bottom: 1px solid rgba(255,255,255,.12);
+}
+.sidebar-logo h2 { font-size: 16px; font-weight: 700; letter-spacing: .5px; }
+.sidebar-logo span { font-size: 11px; opacity: .65; display: block; margin-top: 2px; }
+.sidebar-nav { padding: 16px 0; flex: 1; }
+.sidebar-nav a {
+  display: flex; align-items: center; gap: 12px;
+  padding: 11px 24px;
+  color: rgba(255,255,255,.75);
+  text-decoration: none;
+  font-size: 13.5px;
+  font-weight: 500;
+  border-left: 3px solid transparent;
+  transition: all .2s;
+}
+.sidebar-nav a:hover, .sidebar-nav a.active {
+  background: rgba(255,255,255,.08);
+  color: #fff;
+  border-left-color: var(--accent);
+}
+.sidebar-nav a .nav-icon { width: 20px; text-align: center; flex-shrink: 0; font-size: 15px; }
+.sidebar-footer {
+  padding: 18px 24px;
+  border-top: 1px solid rgba(255,255,255,.12);
+  font-size: 11px; opacity: .5;
+}
+/* HAMBURGER */
+.hamburger {
+  display: none;
+  position: fixed;
+  top: 14px; left: 14px;
+  z-index: 200;
+  background: var(--brand);
+  border: none;
+  color: #fff;
+  width: 42px; height: 42px;
+  border-radius: 10px;
+  cursor: pointer;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 12px rgba(0,0,0,.25);
+}
+.hamburger svg { width: 22px; height: 22px; }
+.overlay {
+  display: none;
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,.5);
+  z-index: 90;
+}
+/* MAIN */
+.main {
+  flex: 1;
+  margin-left: var(--sidebar-w);
+  padding: 32px 40px;
+  max-width: 1280px;
+}
+/* HEADER */
+.header {
+  margin-bottom: 32px;
+}
+.header h1 { font-size: 26px; font-weight: 700; color: var(--brand); }
+[data-theme="dark"] .header h1 { color: var(--brand-light); }
+.header .period {
+  font-size: 14px; color: var(--text-muted);
+  margin-top: 4px;
+}
+.header-row { display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 12px; }
+.theme-toggle {
+  background: var(--card);
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 8px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 13px;
+  display: flex; align-items: center; gap: 6px;
+}
+/* KPI CARDS */
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 18px;
+  margin-bottom: 32px;
+}
+.kpi-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 22px 24px;
+  position: relative;
+  overflow: hidden;
+}
+.kpi-card::before {
+  content: '';
+  position: absolute; top: 0; left: 0;
+  width: 4px; height: 100%;
+}
+.kpi-card.purple::before { background: var(--brand); }
+.kpi-card.gold::before { background: var(--accent); }
+.kpi-card.red::before { background: var(--danger); }
+.kpi-card.green::before { background: var(--success); }
+.kpi-card.blue::before { background: #3b82f6; }
+.kpi-label { font-size: 12px; color: var(--text-muted); text-transform: uppercase; letter-spacing: .7px; font-weight: 600; }
+.kpi-value { font-size: 32px; font-weight: 800; margin: 6px 0 2px; }
+.kpi-sub { font-size: 12.5px; color: var(--text-muted); }
+/* SECTION */
+.section {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 28px;
+  margin-bottom: 24px;
+}
+.section-title {
+  font-size: 17px;
+  font-weight: 700;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+/* DASHBOARD CARDS */
+.cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: 24px;
+  margin-bottom: 32px;
+}
+.dash-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  transition: transform .25s ease, box-shadow .25s ease;
+  display: flex;
+  flex-direction: column;
+  text-decoration: none;
+  color: inherit;
+}
+.dash-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 32px rgba(92,36,80,.15);
+}
+.dash-card-accent {
+  height: 3px;
+  background: linear-gradient(90deg, var(--brand), var(--brand-light), var(--accent));
+  transition: height .25s ease;
+}
+.dash-card:hover .dash-card-accent {
+  height: 5px;
+}
+.dash-card-body {
+  padding: 28px 28px 24px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+.dash-card-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  margin-bottom: 14px;
+}
+.dash-card-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, var(--brand), var(--brand-light));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  flex-shrink: 0;
+  box-shadow: 0 2px 8px rgba(92,36,80,.25);
+}
+.dash-card-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text);
+  line-height: 1.3;
+  margin-top: 2px;
+}
+.dash-card-desc {
+  font-size: 14px;
+  line-height: 1.65;
+  color: var(--text-muted);
+  margin-bottom: 18px;
+  flex: 1;
+}
+.dash-card-stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 22px;
+}
+.stat-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  background: var(--bg);
+  color: var(--text-muted);
+  border: 1px solid var(--border);
+  white-space: nowrap;
+}
+.stat-badge .dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.dot.green { background: #22c55e; }
+.dot.blue { background: #3b82f6; }
+.dot.amber { background: #f59e0b; }
+.dot.red { background: #ef4444; }
+.dot.purple { background: var(--brand); }
+.card-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 24px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, var(--brand), var(--brand-light));
+  color: #fff;
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: all .2s;
+  border: none;
+  cursor: pointer;
+  letter-spacing: .2px;
+}
+.card-btn:hover {
+  filter: brightness(1.15);
+  box-shadow: 0 4px 16px rgba(92,36,80,.25);
+}
+.card-btn .arrow {
+  transition: transform .2s;
+  font-size: 16px;
+}
+.dash-card:hover .card-btn .arrow {
+  transform: translateX(3px);
+}
+/* STATUS */
+.status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  background: rgba(34,197,94,.1);
+  color: #16a34a;
+  border: 1px solid rgba(34,197,94,.2);
+}
+[data-theme="dark"] .status-pill {
+  background: rgba(34,197,94,.15);
+  color: #4ade80;
+}
+.status-dot {
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  background: #22c55e;
+  animation: pulse-dot 2s ease-in-out infinite;
+}
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; }
+  50% { opacity: .4; }
+}
+/* FOOTER */
+.portal-footer {
+  text-align: center;
+  padding: 24px 0 12px;
+  font-size: 12px;
+  color: var(--text-muted);
+}
+/* RESPONSIVE */
+@media (max-width: 900px) {
+  .sidebar { transform: translateX(-100%); }
+  .sidebar.open { transform: translateX(0); }
+  .hamburger { display: flex; }
+  .overlay.show { display: block; }
+  .main { margin-left: 0; padding: 24px 18px; padding-top: 68px; }
+  .cards-grid { grid-template-columns: 1fr; }
+}
+@media (max-width: 600px) {
+  .kpi-grid { grid-template-columns: 1fr; }
+  body { zoom: 1; }
+}
+/* PRINT */
+@media print {
+  .sidebar, .hamburger, .overlay, .theme-toggle { display: none !important; }
+  .main { margin-left: 0; padding: 20px; }
+  .section { break-inside: avoid; }
+}
+</style>
 </head>
 <body>
+<!-- HAMBURGER -->
+<button class="hamburger" onclick="toggleSidebar()" aria-label="Menu">
+  <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+</button>
+<div class="overlay" onclick="toggleSidebar()"></div>
 
-<div class="bg-pattern"></div>
+<!-- SIDEBAR -->
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-logo">
+    <h2>DIAMOND PLUS</h2>
+    <span>Království TianDe</span>
+  </div>
+  <nav class="sidebar-nav">
+    <a href="https://rkonfal.github.io/diamond-plus-portal/" class="active">
+      <span class="nav-icon">🏠</span>
+      Portál
+    </a>
+    <a href="https://rkonfal.github.io/diamond-plus-report/">
+      <span class="nav-icon">💎</span>
+      Finanční Dashboard
+    </a>
+    <a href="https://rkonfal.github.io/4px-obalovy-material/">
+      <span class="nav-icon">📦</span>
+      Obalový materiál
+    </a>
+    <a href="https://rkonfal.github.io/4px-kpi-dashboard/">
+      <span class="nav-icon">📊</span>
+      Delivery KPI
+    </a>
+  </nav>
+  <div class="sidebar-footer">
+    Diamond Plus s.r.o.<br>
+    Reporting Portal
+  </div>
+</aside>
 
-<!-- ═══════════ HEADER ═══════════ -->
-<header class="header">
-    <div class="header-inner">
-        <div class="header-top">
-            <div class="logo">💎</div>
-            <div class="header-brand">
-                <h1>Diamond <span>Plus</span></h1>
-                <div class="tagline">s.r.o. • Reporting Portal</div>
-            </div>
-            <div style="margin-left:auto;">
-                <div class="status-pill">
-                    <div class="status-dot"></div>
-                    Systémy aktivní
-                </div>
-            </div>
+<!-- MAIN -->
+<div class="main">
+  <!-- HEADER -->
+  <div class="header">
+    <div class="header-row">
+      <div>
+        <h1>💎 Diamond Plus — Reporting Portal</h1>
+        <div class="period">Přehled reportů a dashboardů &nbsp;|&nbsp; Diamond Plus s.r.o. / Království TianDe</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:12px;">
+        <div class="status-pill">
+          <div class="status-dot"></div>
+          Systémy aktivní
         </div>
-        <h2>Přehled reportů a dashboardů</h2>
+        <button class="theme-toggle" onclick="toggleTheme()">
+          <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
+          Tmavý režim
+        </button>
+      </div>
     </div>
-</header>
+  </div>
 
-<!-- ═══════════ MAIN ═══════════ -->
-<main class="main">
+  <!-- KPI CARDS -->
+  <div class="kpi-grid">
+    <div class="kpi-card green">
+      <div class="kpi-label">Tržby 3/2026</div>
+      <div class="kpi-value">14,5M Kč</div>
+      <div class="kpi-sub">📈 Konsolidované tržby</div>
+    </div>
+    <div class="kpi-card blue">
+      <div class="kpi-label">Čistý zisk</div>
+      <div class="kpi-value">902 tis. Kč</div>
+      <div class="kpi-sub">💰 Za období březen 2026</div>
+    </div>
+    <div class="kpi-card gold">
+      <div class="kpi-label">Zásilek týdně</div>
+      <div class="kpi-value">18 635</div>
+      <div class="kpi-sub">📦 Průměrný týdenní objem</div>
+    </div>
+    <div class="kpi-card purple">
+      <div class="kpi-label">KPI březen</div>
+      <div class="kpi-value">100 %</div>
+      <div class="kpi-sub">✅ Plnění SLA cílů</div>
+    </div>
+  </div>
 
-    <!-- Summary bar -->
-    <div class="summary-bar">
-        <div class="summary-item">
-            <div class="summary-icon green">📈</div>
-            <div>
-                <div class="summary-value">14,5M Kč</div>
-                <div class="summary-label">Tržby 3/2026</div>
-            </div>
+  <!-- DASHBOARDS SECTION -->
+  <div class="section-title">📋 Dostupné dashboardy</div>
+
+  <div class="cards-grid">
+
+    <!-- Card 1: Finanční Dashboard -->
+    <div class="dash-card">
+      <div class="dash-card-accent"></div>
+      <div class="dash-card-body">
+        <div class="dash-card-header">
+          <div class="dash-card-icon">💎</div>
+          <div class="dash-card-title">Finanční Dashboard</div>
         </div>
-        <div class="summary-item">
-            <div class="summary-icon blue">💰</div>
-            <div>
-                <div class="summary-value">902 tis. Kč</div>
-                <div class="summary-label">Čistý zisk</div>
-            </div>
+        <div class="dash-card-desc">
+          Konsolidované hospodaření Diamond Plus s.r.o. za období 2025–2026. Výkaz zisků a ztrát, účetní deník, grafy.
         </div>
-        <div class="summary-item">
-            <div class="summary-icon amber">📦</div>
-            <div>
-                <div class="summary-value">18 635</div>
-                <div class="summary-label">Zásilek týdně</div>
-            </div>
+        <div class="dash-card-stats">
+          <span class="stat-badge"><span class="dot green"></span>Tržby 14,5M Kč</span>
+          <span class="stat-badge"><span class="dot blue"></span>Zisk 902 tis. Kč</span>
+          <span class="stat-badge"><span class="dot purple"></span>4 období</span>
         </div>
-        <div class="summary-item">
-            <div class="summary-icon purple">✅</div>
-            <div>
-                <div class="summary-value">100 %</div>
-                <div class="summary-label">KPI březen</div>
-            </div>
-        </div>
+        <a href="https://rkonfal.github.io/diamond-plus-report/" target="_blank" class="card-btn">
+          Otevřít report <span class="arrow">→</span>
+        </a>
+      </div>
     </div>
 
-    <!-- Cards section -->
-    <div class="section-title">Dostupné dashboardy</div>
-
-    <div class="cards">
-
-        <!-- Card 1: Finanční Dashboard -->
-        <div class="card">
-            <div class="card-accent"></div>
-            <div class="card-body">
-                <div class="card-header">
-                    <div class="card-icon">💎</div>
-                    <div class="card-title">Finanční Dashboard</div>
-                </div>
-                <div class="card-desc">
-                    Konsolidované hospodaření Diamond Plus s.r.o. za období 2025–2026. Výkaz zisků a ztrát, účetní deník, grafy.
-                </div>
-                <div class="card-stats">
-                    <span class="stat-badge"><span class="dot green"></span>Tržby 14,5M Kč</span>
-                    <span class="stat-badge"><span class="dot blue"></span>Zisk 902 tis. Kč</span>
-                    <span class="stat-badge"><span class="dot purple"></span>4 období</span>
-                </div>
-                <a href="https://rkonfal.github.io/diamond-plus-report/" target="_blank" class="card-btn">
-                    Otevřít report <span class="arrow">→</span>
-                </a>
-            </div>
+    <!-- Card 2: Obalový materiál -->
+    <div class="dash-card">
+      <div class="dash-card-accent"></div>
+      <div class="dash-card-body">
+        <div class="dash-card-header">
+          <div class="dash-card-icon">📦</div>
+          <div class="dash-card-title">Spotřeba obalového materiálu</div>
         </div>
-
-        <!-- Card 2: Obalový materiál -->
-        <div class="card">
-            <div class="card-accent"></div>
-            <div class="card-body">
-                <div class="card-header">
-                    <div class="card-icon">📦</div>
-                    <div class="card-title">Spotřeba obalového materiálu</div>
-                </div>
-                <div class="card-desc">
-                    Týdenní přehledy spotřeby obalů od 4PX. Trendy zásob, varování, rozložení velikostí.
-                </div>
-                <div class="card-stats">
-                    <span class="stat-badge"><span class="dot blue"></span>18 635 zásilek</span>
-                    <span class="stat-badge"><span class="dot green"></span>7 týdnů</span>
-                    <span class="stat-badge"><span class="dot red"></span>Kritický stav M krabic</span>
-                </div>
-                <a href="https://rkonfal.github.io/4px-obalovy-material/" target="_blank" class="card-btn">
-                    Otevřít report <span class="arrow">→</span>
-                </a>
-            </div>
+        <div class="dash-card-desc">
+          Týdenní přehledy spotřeby obalů od 4PX. Trendy zásob, varování, rozložení velikostí.
         </div>
-
-        <!-- Card 3: 4PX Delivery KPI -->
-        <div class="card">
-            <div class="card-accent"></div>
-            <div class="card-body">
-                <div class="card-header">
-                    <div class="card-icon">📊</div>
-                    <div class="card-title">4PX Delivery KPI</div>
-                </div>
-                <div class="card-desc">
-                    Měsíční KPI expedice a příjmu. Plnění SLA, doba zpracování, rozložení přepravců.
-                </div>
-                <div class="card-stats">
-                    <span class="stat-badge"><span class="dot green"></span>103 857 objednávek</span>
-                    <span class="stat-badge"><span class="dot blue"></span>9 měsíců</span>
-                    <span class="stat-badge"><span class="dot green"></span>100 % KPI březen</span>
-                </div>
-                <a href="https://rkonfal.github.io/4px-kpi-dashboard/" target="_blank" class="card-btn">
-                    Otevřít report <span class="arrow">→</span>
-                </a>
-            </div>
+        <div class="dash-card-stats">
+          <span class="stat-badge"><span class="dot blue"></span>18 635 zásilek</span>
+          <span class="stat-badge"><span class="dot green"></span>7 týdnů</span>
+          <span class="stat-badge"><span class="dot red"></span>Kritický stav M krabic</span>
         </div>
-
+        <a href="https://rkonfal.github.io/4px-obalovy-material/" target="_blank" class="card-btn">
+          Otevřít report <span class="arrow">→</span>
+        </a>
+      </div>
     </div>
-</main>
 
-<!-- ═══════════ FOOTER ═══════════ -->
-<footer class="footer">
-    <span>Generováno pomocí AI • Poslední aktualizace: duben 2026 • Diamond Plus s.r.o.</span>
-</footer>
+    <!-- Card 3: 4PX Delivery KPI -->
+    <div class="dash-card">
+      <div class="dash-card-accent"></div>
+      <div class="dash-card-body">
+        <div class="dash-card-header">
+          <div class="dash-card-icon">📊</div>
+          <div class="dash-card-title">4PX Delivery KPI</div>
+        </div>
+        <div class="dash-card-desc">
+          Měsíční KPI expedice a příjmu. Plnění SLA, doba zpracování, rozložení přepravců.
+        </div>
+        <div class="dash-card-stats">
+          <span class="stat-badge"><span class="dot green"></span>103 857 objednávek</span>
+          <span class="stat-badge"><span class="dot blue"></span>9 měsíců</span>
+          <span class="stat-badge"><span class="dot green"></span>100 % KPI březen</span>
+        </div>
+        <a href="https://rkonfal.github.io/4px-kpi-dashboard/" target="_blank" class="card-btn">
+          Otevřít report <span class="arrow">→</span>
+        </a>
+      </div>
+    </div>
 
+  </div>
+
+  <!-- FOOTER -->
+  <div class="portal-footer">
+    Diamond Plus s.r.o. / Království TianDe &nbsp;|&nbsp; Reporting Portal &nbsp;|&nbsp; Poslední aktualizace: duben 2026
+  </div>
+</div>
+
+<script>
+// Theme
+function toggleTheme() {
+  const d = document.documentElement;
+  d.setAttribute('data-theme', d.getAttribute('data-theme') === 'dark' ? '' : 'dark');
+}
+// Sidebar
+function toggleSidebar() {
+  document.getElementById('sidebar').classList.toggle('open');
+  document.querySelector('.overlay').classList.toggle('show');
+}
+</script>
 </body>
 </html>
