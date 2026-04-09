@@ -1,835 +1,580 @@
 <!DOCTYPE html>
-<html lang="cs">
+<html lang="cs" class="h-full">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Diamond Plus — Finanční přehled</title>
-<style>
-:root {
-  --brand: #5C2450;
-  --brand-light: #7a3a6c;
-  --brand-dark: #3e1836;
-  --accent: #e6a817;
-  --success: #22c55e;
-  --warning: #f59e0b;
-  --danger: #ef4444;
-  --bg: #f4f5f7;
-  --card: #ffffff;
-  --text: #1e1e2f;
-  --text-muted: #6b7280;
-  --border: #e5e7eb;
-  --sidebar-w: 260px;
-  --radius: 12px;
-}
-[data-theme="dark"] {
-  --bg: #0f1117;
-  --card: #1a1c25;
-  --text: #e4e4e7;
-  --text-muted: #9ca3af;
-  --border: #2d2f3a;
-  --brand-light: #9b6490;
-}
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-html { scroll-behavior: smooth; overflow-x: hidden; }
-body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-  background: var(--bg);
-  color: var(--text);
-  line-height: 1.6;
-  zoom: 1;
-  min-height: 100vh;
-  display: flex;
-  overflow-x: hidden;
-}
-
-/* ─── SIDEBAR ─── */
-.sidebar {
-  width: var(--sidebar-w);
-  background: linear-gradient(180deg, var(--brand-dark) 0%, var(--brand) 100%);
-  color: #fff;
-  position: fixed;
-  top: 0; left: 0;
-  height: 100vh;
-  z-index: 100;
-  display: flex;
-  flex-direction: column;
-  transition: transform .3s ease;
-  overflow-y: auto;
-}
-.sidebar-logo {
-  padding: 28px 24px 20px;
-  border-bottom: 1px solid rgba(255,255,255,.12);
-}
-.sidebar-logo h2 { font-size: 16px; font-weight: 700; letter-spacing: .5px; }
-.sidebar-logo span { font-size: 11px; opacity: .65; display: block; margin-top: 2px; }
-.sidebar-section-label {
-  font-size: 10px;
-  text-transform: uppercase;
-  letter-spacing: 1.2px;
-  opacity: .45;
-  padding: 18px 24px 6px;
-  font-weight: 700;
-}
-.sidebar-nav { padding: 8px 0; flex: 1; }
-.sidebar-nav a {
-  display: flex; align-items: center; gap: 12px;
-  padding: 11px 24px;
-  color: rgba(255,255,255,.75);
-  text-decoration: none;
-  font-size: 13.5px;
-  font-weight: 500;
-  border-left: 3px solid transparent;
-  transition: all .2s;
-}
-.sidebar-nav a:hover, .sidebar-nav a.active {
-  background: rgba(255,255,255,.08);
-  color: #fff;
-  border-left-color: var(--accent);
-}
-.sidebar-nav a .nav-icon { width: 20px; text-align: center; flex-shrink: 0; font-size: 15px; }
-.sidebar-footer {
-  padding: 18px 24px;
-  border-top: 1px solid rgba(255,255,255,.12);
-  font-size: 11px; opacity: .5;
-}
-.sidebar-divider {
-  height: 1px;
-  background: rgba(255,255,255,.12);
-  margin: 6px 24px;
-}
-
-/* ─── HAMBURGER ─── */
-.hamburger {
-  display: none;
-  position: fixed;
-  top: 14px; left: 14px;
-  z-index: 200;
-  background: var(--brand);
-  border: none;
-  color: #fff;
-  width: 42px; height: 42px;
-  border-radius: 10px;
-  cursor: pointer;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 2px 12px rgba(0,0,0,.25);
-}
-.hamburger svg { width: 22px; height: 22px; }
-.overlay {
-  display: none;
-  position: fixed; inset: 0;
-  background: rgba(0,0,0,.5);
-  z-index: 90;
-}
-
-/* ─── MAIN ─── */
-.main {
-  flex: 1;
-  margin-left: var(--sidebar-w);
-  padding: 36px 44px;
-  max-width: calc(100vw - 260px);
-  overflow-x: hidden;
-}
-
-/* ─── HEADER ─── */
-.header { margin-bottom: 36px; }
-.header-row { display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 12px; }
-.header h1 {
-  font-size: 28px;
-  font-weight: 800;
-  color: var(--brand);
-  letter-spacing: -.3px;
-}
-[data-theme="dark"] .header h1 { color: var(--brand-light); }
-.header-sub {
-  font-size: 14px;
-  color: var(--text-muted);
-  margin-top: 5px;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  flex-wrap: wrap;
-}
-.header-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  background: rgba(34,197,94,.1);
-  color: #16a34a;
-  border: 1px solid rgba(34,197,94,.2);
-  border-radius: 20px;
-  padding: 4px 12px;
-  font-size: 12px;
-  font-weight: 600;
-}
-[data-theme="dark"] .header-badge { background: rgba(34,197,94,.15); color: #4ade80; }
-.pulse { width: 7px; height: 7px; border-radius: 50%; background: #22c55e; animation: blink 2s ease-in-out infinite; flex-shrink: 0; }
-@keyframes blink { 0%,100%{opacity:1} 50%{opacity:.35} }
-.theme-toggle {
-  background: var(--card);
-  border: 1px solid var(--border);
-  color: var(--text);
-  padding: 9px 16px;
-  border-radius: 9px;
-  cursor: pointer;
-  font-size: 13px;
-  display: flex; align-items: center; gap: 7px;
-  font-weight: 500;
-  transition: background .2s;
-}
-.theme-toggle:hover { background: var(--border); }
-
-/* ─── SECTION LABEL ─── */
-.block-label {
-  font-size: 11px;
-  text-transform: uppercase;
-  letter-spacing: 1.3px;
-  font-weight: 700;
-  color: var(--text-muted);
-  margin-bottom: 16px;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-.block-label::after {
-  content: '';
-  flex: 1;
-  height: 1px;
-  background: var(--border);
-}
-
-/* ─── BIG KPI CARDS ─── */
-.kpi-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-  gap: 18px;
-  margin-bottom: 40px;
-}
-.kpi-card {
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 24px 26px 22px;
-  position: relative;
-  overflow: hidden;
-}
-.kpi-card::before {
-  content: '';
-  position: absolute; top: 0; left: 0;
-  width: 4px; height: 100%;
-}
-.kpi-card.green::before  { background: var(--success); }
-.kpi-card.amber::before  { background: var(--warning); }
-.kpi-card.blue::before   { background: #3b82f6; }
-.kpi-card.purple::before { background: var(--brand); }
-
-.kpi-traffic {
-  position: absolute;
-  top: 16px; right: 20px;
-  font-size: 20px;
-  line-height: 1;
-}
-.kpi-what {
-  font-size: 10.5px;
-  color: var(--text-muted);
-  text-transform: uppercase;
-  letter-spacing: .8px;
-  font-weight: 700;
-  margin-bottom: 4px;
-}
-.kpi-name {
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--text-muted);
-  margin-bottom: 10px;
-  padding-right: 30px;
-  line-height: 1.4;
-}
-.kpi-value {
-  font-size: 32px;
-  font-weight: 900;
-  letter-spacing: -1px;
-  line-height: 1;
-  margin-bottom: 10px;
-  color: var(--text);
-}
-.kpi-delta {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  font-size: 12px;
-  font-weight: 700;
-  padding: 3px 10px;
-  border-radius: 12px;
-  margin-bottom: 10px;
-}
-.kpi-delta.up   { background: rgba(34,197,94,.12);  color: #15803d; }
-.kpi-delta.flat { background: rgba(59,130,246,.12); color: #1d4ed8; }
-.kpi-delta.warn { background: rgba(245,158,11,.12); color: #92400e; }
-[data-theme="dark"] .kpi-delta.up   { background: rgba(34,197,94,.18);  color: #4ade80; }
-[data-theme="dark"] .kpi-delta.flat { background: rgba(59,130,246,.18); color: #93c5fd; }
-[data-theme="dark"] .kpi-delta.warn { background: rgba(245,158,11,.18); color: #fbbf24; }
-.kpi-explain {
-  font-size: 12px;
-  color: var(--text-muted);
-  line-height: 1.55;
-}
-
-/* ─── DASHBOARD CARDS ─── */
-.cards-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
-  gap: 22px;
-  margin-bottom: 40px;
-}
-.dash-card {
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-  transition: transform .25s ease, box-shadow .25s ease;
-}
-.dash-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 10px 36px rgba(92,36,80,.12);
-}
-.dash-card-bar {
-  height: 4px;
-  background: linear-gradient(90deg, var(--brand), var(--brand-light), var(--accent));
-  transition: height .25s;
-}
-.dash-card:hover .dash-card-bar { height: 6px; }
-.dash-card-body {
-  padding: 26px 28px 24px;
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-}
-.dash-card-head {
-  display: flex;
-  align-items: flex-start;
-  gap: 14px;
-  margin-bottom: 12px;
-}
-.dash-icon {
-  width: 50px; height: 50px;
-  border-radius: 13px;
-  background: linear-gradient(135deg, var(--brand), var(--brand-light));
-  display: flex; align-items: center; justify-content: center;
-  font-size: 23px;
-  flex-shrink: 0;
-  box-shadow: 0 3px 10px rgba(92,36,80,.2);
-}
-.dash-title {
-  font-size: 17px;
-  font-weight: 700;
-  color: var(--text);
-  line-height: 1.3;
-}
-.dash-subtitle {
-  font-size: 12px;
-  color: var(--text-muted);
-  margin-top: 2px;
-}
-.dash-desc {
-  font-size: 13.5px;
-  color: var(--text-muted);
-  line-height: 1.65;
-  margin-bottom: 16px;
-  flex: 1;
-}
-.dash-numbers {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 7px;
-  margin-bottom: 20px;
-}
-.num-chip {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 5px 11px;
-  border-radius: 20px;
-  font-size: 12px;
-  font-weight: 600;
-  background: var(--bg);
-  color: var(--text);
-  border: 1px solid var(--border);
-  white-space: nowrap;
-}
-.num-chip .dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
-.dot.g { background: #22c55e; }
-.dot.a { background: #f59e0b; }
-.dot.r { background: #ef4444; }
-.dot.b { background: #3b82f6; }
-.dot.p { background: var(--brand); }
-.btn-detail {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  padding: 12px 22px;
-  border-radius: 10px;
-  background: linear-gradient(135deg, var(--brand), var(--brand-light));
-  color: #fff;
-  font-size: 14px;
-  font-weight: 600;
-  text-decoration: none;
-  transition: all .2s;
-  letter-spacing: .1px;
-  align-self: flex-start;
-}
-.btn-detail:hover { filter: brightness(1.12); box-shadow: 0 4px 16px rgba(92,36,80,.25); }
-.btn-detail .arr { transition: transform .2s; font-size: 15px; }
-.dash-card:hover .btn-detail .arr { transform: translateX(3px); }
-
-/* ─── ALERT CARD ─── */
-.alert-card {
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  overflow: hidden;
-  margin-bottom: 36px;
-}
-.alert-card-bar {
-  height: 4px;
-  background: linear-gradient(90deg, var(--danger), var(--warning), var(--accent));
-}
-.alert-card-body { padding: 26px 28px 28px; }
-.alert-head {
-  display: flex; align-items: center; gap: 14px;
-  margin-bottom: 22px;
-}
-.alert-icon {
-  width: 50px; height: 50px;
-  border-radius: 13px;
-  background: linear-gradient(135deg, #b91c1c, #ef4444);
-  display: flex; align-items: center; justify-content: center;
-  font-size: 23px;
-  flex-shrink: 0;
-  box-shadow: 0 3px 10px rgba(239,68,68,.25);
-}
-.alert-title { font-size: 17px; font-weight: 700; }
-.alert-subtitle { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
-.alert-list { display: flex; flex-direction: column; gap: 12px; }
-.alert-item {
-  display: flex;
-  align-items: flex-start;
-  gap: 14px;
-  padding: 16px 18px;
-  border-radius: 10px;
-  border: 1px solid var(--border);
-  background: var(--bg);
-}
-.alert-item.red {
-  border-left: 4px solid var(--danger);
-  background: rgba(239,68,68,.035);
-}
-.alert-item.amber {
-  border-left: 4px solid var(--warning);
-  background: rgba(245,158,11,.035);
-}
-[data-theme="dark"] .alert-item.red   { background: rgba(239,68,68,.08); }
-[data-theme="dark"] .alert-item.amber { background: rgba(245,158,11,.08); }
-.alert-emoji { font-size: 20px; line-height: 1; margin-top: 2px; flex-shrink: 0; }
-.alert-msg {
-  font-size: 14px;
-  font-weight: 700;
-  color: var(--text);
-  line-height: 1.4;
-  margin-bottom: 4px;
-}
-.alert-detail {
-  font-size: 12.5px;
-  color: var(--text-muted);
-  line-height: 1.55;
-  margin-bottom: 6px;
-}
-.alert-cta {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  font-size: 12px;
-  font-weight: 700;
-  color: var(--brand);
-  padding: 3px 9px;
-  border-radius: 6px;
-  background: rgba(92,36,80,.07);
-}
-[data-theme="dark"] .alert-cta { color: var(--brand-light); background: rgba(155,100,144,.15); }
-
-/* ─── FOOTER ─── */
-.portal-footer {
-  text-align: center;
-  padding: 24px 0 14px;
-  font-size: 12px;
-  color: var(--text-muted);
-  border-top: 1px solid var(--border);
-}
-
-/* ─── RESPONSIVE ─── */
-@media (max-width: 900px) {
-  .sidebar { transform: translateX(-100%); }
-  .sidebar.open { transform: translateX(0); }
-  .hamburger { display: flex; }
-  .overlay.show { display: block; }
-  .main { margin-left: 0; padding: 24px 18px; padding-top: 70px; max-width: 100vw; }
-  .cards-grid { grid-template-columns: 1fr; }
-  .kpi-grid { grid-template-columns: repeat(2, 1fr); }
-}
-@media (max-width: 560px) {
-  .kpi-grid { grid-template-columns: 1fr; }
-  .kpi-value { font-size: 28px; }
-  .main { padding: 16px 14px; padding-top: 68px; }
-}
-@media print {
-  .sidebar, .hamburger, .overlay, .theme-toggle { display: none !important; }
-  .main { margin-left: 0; padding: 20px; max-width: 100vw; }
-}
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Diamond Plus — Portál</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: { sans: ['Inter', 'ui-sans-serif', 'system-ui'] },
+          colors: {
+            brand: {
+              DEFAULT: '#4A154B',
+              light: '#6B2D6C',
+              dark: '#350F36',
+              50: '#F9F0F9',
+              100: '#F0D9F0',
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body { font-family: 'Inter', sans-serif; }
+    .sidebar-link { transition: background 0.15s, color 0.15s; }
+    .sidebar-link:hover { background: rgba(255,255,255,0.12); }
+    .sidebar-link.active { background: rgba(255,255,255,0.18); font-weight: 600; }
+    .card-hover { transition: box-shadow 0.2s, transform 0.2s; }
+    .card-hover:hover { box-shadow: 0 8px 30px rgba(74,21,75,0.12); transform: translateY(-2px); }
+    .kpi-card { transition: box-shadow 0.2s, transform 0.2s; }
+    .kpi-card:hover { box-shadow: 0 6px 24px rgba(74,21,75,0.14); transform: translateY(-2px); }
+    #sidebar { transition: transform 0.25s cubic-bezier(.4,0,.2,1); }
+    .alert-item { transition: background 0.15s; border-radius: 0.75rem; }
+    .alert-item:hover { background: #f5f0f5; }
+    .dark .alert-item:hover { background: #2d1f2e; }
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #d1c4d2; border-radius: 99px; }
+    .dark ::-webkit-scrollbar-thumb { background: #4a2f4b; }
+  </style>
 </head>
-<body>
+<body class="h-full bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100">
 
-<!-- HAMBURGER -->
-<button class="hamburger" onclick="toggleSidebar()" aria-label="Menu">
-  <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
-</button>
-<div class="overlay" onclick="toggleSidebar()"></div>
+<!-- ── SIDEBAR ─────────────────────────────────────────────────────────── -->
+<aside id="sidebar"
+  class="fixed inset-y-0 left-0 z-40 w-64 flex flex-col"
+  style="background: linear-gradient(180deg, #4A154B 0%, #350F36 100%);">
 
-<!-- SIDEBAR -->
-<aside class="sidebar" id="sidebar">
-  <div class="sidebar-logo">
-    <h2>💎 DIAMOND PLUS</h2>
-    <span>Finanční přehled · Q1 2026</span>
+  <!-- Logo -->
+  <div class="flex items-center gap-3 px-6 py-5 border-b border-white/10">
+    <div class="w-9 h-9 rounded-xl bg-white/20 flex items-center justify-center text-white font-bold text-lg select-none">D+</div>
+    <div>
+      <div class="text-white font-semibold text-[15px] leading-tight">Diamond Plus</div>
+      <div class="text-white/50 text-[11px]">Business Portal</div>
+    </div>
   </div>
-  <nav class="sidebar-nav">
-    <div class="sidebar-section-label">Hlavní přehled</div>
-    <a href="https://rkonfal.github.io/diamond-plus-portal/" class="active">
-      <span class="nav-icon">🏠</span> Portál
+
+  <!-- Nav -->
+  <nav class="flex-1 overflow-y-auto py-4 px-3 space-y-0.5">
+    <a href="#" class="sidebar-link active flex items-center gap-3 px-3 py-2.5 rounded-lg text-white text-sm">
+      <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+      Dashboard
     </a>
-    <div class="sidebar-divider"></div>
-    <div class="sidebar-section-label">Detailní reporty</div>
-    <a href="https://rkonfal.github.io/diamond-plus-report/">
-      <span class="nav-icon">💰</span> Hospodaření
+    <a href="https://rkonfal.github.io/diamond-plus-report/" target="_blank" class="sidebar-link flex items-center gap-3 px-3 py-2.5 rounded-lg text-white/80 hover:text-white text-sm">
+      <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
+      Hospodaření
     </a>
-    <a href="https://rkonfal.github.io/4px-obalovy-material/">
-      <span class="nav-icon">📦</span> Obaly
+    <a href="https://rkonfal.github.io/inventory-dashboard/" target="_blank" class="sidebar-link flex items-center gap-3 px-3 py-2.5 rounded-lg text-white/80 hover:text-white text-sm">
+      <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20 7H4a2 2 0 00-2 2v10a2 2 0 002 2h16a2 2 0 002-2V9a2 2 0 00-2-2z"/><path d="M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2"/></svg>
+      Sklad
     </a>
-    <a href="https://rkonfal.github.io/4px-kpi-dashboard/">
-      <span class="nav-icon">📊</span> Expedice
+    <a href="https://rkonfal.github.io/4px-kpi-dashboard/" target="_blank" class="sidebar-link flex items-center gap-3 px-3 py-2.5 rounded-lg text-white/80 hover:text-white text-sm">
+      <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 17H3a2 2 0 01-2-2V5a2 2 0 012-2h11a2 2 0 012 2v3"/><rect x="9" y="11" width="14" height="10" rx="2"/><path d="M12 14h.01M16 14h.01M12 18h.01M16 18h.01"/></svg>
+      Expedice
     </a>
-    <a href="https://rkonfal.github.io/4px-carriers/">
-      <span class="nav-icon">🚚</span> Přepravci
+    <a href="https://rkonfal.github.io/4px-carriers/" target="_blank" class="sidebar-link flex items-center gap-3 px-3 py-2.5 rounded-lg text-white/80 hover:text-white text-sm">
+      <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M1 3h15v13H1z"/><path d="M16 8h4l3 3v5h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+      Přepravci
     </a>
-    <a href="https://rkonfal.github.io/eshop-dashboard/">
-      <span class="nav-icon">🛒</span> E-shop
+    <a href="https://rkonfal.github.io/eshop-dashboard/" target="_blank" class="sidebar-link flex items-center gap-3 px-3 py-2.5 rounded-lg text-white/80 hover:text-white text-sm">
+      <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
+      E-shop
     </a>
-    <a href="https://rkonfal.github.io/inventory-dashboard/">
-      <span class="nav-icon">📋</span> Sklad
+    <a href="https://rkonfal.github.io/4px-obalovy-material/" target="_blank" class="sidebar-link flex items-center gap-3 px-3 py-2.5 rounded-lg text-white/80 hover:text-white text-sm">
+      <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/></svg>
+      Obaly
+    </a>
+    <a href="https://rkonfal.github.io/balicky-dashboard/" target="_blank" class="sidebar-link flex items-center gap-3 px-3 py-2.5 rounded-lg text-white/80 hover:text-white text-sm">
+      <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 2l9 5-9 5-9-5 9-5z"/><path d="M3 7l9 5 9-5"/><path d="M3 12l9 5 9-5"/><path d="M3 17l9 5 9-5"/></svg>
+      Balíčky
+    </a>
+    <a href="https://rkonfal.github.io/skupiny-dashboard/" target="_blank" class="sidebar-link flex items-center gap-3 px-3 py-2.5 rounded-lg text-white/80 hover:text-white text-sm">
+      <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="9" cy="7" r="4"/><path d="M3 21v-2a4 4 0 014-4h4a4 4 0 014 4v2"/><path d="M16 3.13a4 4 0 010 7.75"/><path d="M21 21v-2a4 4 0 00-3-3.87"/></svg>
+      Skupiny
+    </a>
+    <a href="https://rkonfal.github.io/expirace-dashboard/" target="_blank" class="sidebar-link flex items-center gap-3 px-3 py-2.5 rounded-lg text-white/80 hover:text-white text-sm">
+      <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+      Expirace
     </a>
   </nav>
-  <div class="sidebar-footer">
-    Diamond Plus s.r.o.<br>
-    Reporting Portal
+
+  <!-- Dark mode toggle + version -->
+  <div class="px-4 py-4 border-t border-white/10">
+    <button id="darkToggle"
+      onclick="toggleDark()"
+      class="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-white/70 hover:text-white hover:bg-white/10 text-sm transition">
+      <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+        <path d="M21 12.79A9 9 0 1111.21 3a7 7 0 009.79 9.79z"/>
+      </svg>
+      <span>Tmavý režim</span>
+    </button>
+    <p class="text-white/25 text-[10px] text-center mt-3">v2.0 · Diamond Plus &copy; 2025</p>
   </div>
 </aside>
 
-<!-- MAIN CONTENT -->
-<div class="main">
+<!-- ── OVERLAY (mobile) ──────────────────────────────────────────────── -->
+<div id="overlay" class="fixed inset-0 z-30 bg-black/50 hidden" onclick="closeSidebar()"></div>
 
-  <!-- HEADER -->
-  <div class="header">
-    <div class="header-row">
-      <div>
-        <h1>💎 Diamond Plus — Finanční přehled</h1>
-        <div class="header-sub">
-          <span>Manažerský dashboard · Q1 2026</span>
-          <div class="header-badge"><div class="pulse"></div> Systémy aktivní</div>
-        </div>
-      </div>
-      <button class="theme-toggle" onclick="toggleTheme()">
-        <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
-        Tmavý režim
-      </button>
-    </div>
-  </div>
+<!-- ── MAIN ──────────────────────────────────────────────────────────── -->
+<div class="lg:pl-64 min-h-screen flex flex-col">
 
-  <!-- ═══ JAK SI VEDEME? ═══ -->
-  <div class="block-label">Jak si vedeme? &nbsp;·&nbsp; Q1 2026 celkem</div>
-
-  <div class="kpi-grid">
-
-    <div class="kpi-card green">
-      <div class="kpi-traffic">🟢</div>
-      <div class="kpi-what">Tržby · Q1 2026</div>
-      <div class="kpi-name">Kolik zákazníci utratili</div>
-      <div class="kpi-value">48,1 M Kč</div>
-      <div class="kpi-delta up">↑ +5 % vs Q4 2025</div>
-      <div class="kpi-explain">Tržby rostou — lepší čtvrtletí než konec roku 2025. Dobrý signál.</div>
-    </div>
-
-    <div class="kpi-card amber">
-      <div class="kpi-traffic">🟡</div>
-      <div class="kpi-what">Zisk · Q1 2026</div>
-      <div class="kpi-name">Co nám zůstane po všech nákladech</div>
-      <div class="kpi-value">2,0 M Kč</div>
-      <div class="kpi-delta warn">⚠ Nižší marže v březnu</div>
-      <div class="kpi-explain">Kurzové ztráty 1,3 M Kč stlačily březnový zisk. Neobvyklé — prověřit.</div>
-    </div>
-
-    <div class="kpi-card blue">
-      <div class="kpi-traffic">🟢</div>
-      <div class="kpi-what">Průměrná objednávka</div>
-      <div class="kpi-name">Kolik utratí průměrný zákazník</div>
-      <div class="kpi-value">1 457 Kč</div>
-      <div class="kpi-delta flat">→ Stabilní</div>
-      <div class="kpi-explain">Hodnota objednávky se nemění — zákazníci nekupují méně ani více.</div>
-    </div>
-
-    <div class="kpi-card purple">
-      <div class="kpi-traffic">🟢</div>
-      <div class="kpi-what">Náklady na zásilku</div>
-      <div class="kpi-name">Kolik nás stojí doručit 1 balík</div>
-      <div class="kpi-value">~100 Kč/ks</div>
-      <div class="kpi-delta up">↓ Klesající trend</div>
-      <div class="kpi-explain">Čím více zásilek, tím levněji na kus. Efektivita expedice roste.</div>
-    </div>
-
-  </div>
-
-  <!-- ═══ DETAILNÍ PŘEHLEDY ═══ -->
-  <div class="block-label">Detailní přehledy &nbsp;·&nbsp; Klikni pro detail</div>
-
-  <div class="cards-grid">
-
-    <!-- 1. Hospodaření firmy -->
-    <div class="dash-card">
-      <div class="dash-card-bar"></div>
-      <div class="dash-card-body">
-        <div class="dash-card-head">
-          <div class="dash-icon">💰</div>
-          <div>
-            <div class="dash-title">Hospodaření firmy</div>
-            <div class="dash-subtitle">ABRA Flexi · Q1 2026</div>
-          </div>
-        </div>
-        <div class="dash-desc">
-          Kolik vyděláváme a kde utrácíme. Celkové tržby, zisk, marže a vývoj od začátku roku — bez účetního žargonu.
-        </div>
-        <div class="dash-numbers">
-          <span class="num-chip"><span class="dot g"></span>Tržby 14,5 M Kč/měs</span>
-          <span class="num-chip"><span class="dot b"></span>Zisk 1,6 M v březnu</span>
-          <span class="num-chip"><span class="dot a"></span>Marže 19 %</span>
-        </div>
-        <a href="https://rkonfal.github.io/diamond-plus-report/" target="_blank" class="btn-detail">
-          Zobrazit detail <span class="arr">→</span>
-        </a>
-      </div>
-    </div>
-
-    <!-- 2. Spotřeba obalů -->
-    <div class="dash-card">
-      <div class="dash-card-bar"></div>
-      <div class="dash-card-body">
-        <div class="dash-card-head">
-          <div class="dash-icon">📦</div>
-          <div>
-            <div class="dash-title">Spotřeba obalů</div>
-            <div class="dash-subtitle">4PX sklad · týdenní data</div>
-          </div>
-        </div>
-        <div class="dash-desc">
-          Kolik krabic spotřebujeme a kdy dojdou zásoby. Přehled po velikostech M, L, XL s varováním před vyčerpáním.
-        </div>
-        <div class="dash-numbers">
-          <span class="num-chip"><span class="dot b"></span>2 662 zásilek/týden</span>
-          <span class="num-chip"><span class="dot r"></span>⚠ M krabice ~8 týdnů</span>
-          <span class="num-chip"><span class="dot g"></span>L, XL v pořádku</span>
-        </div>
-        <a href="https://rkonfal.github.io/4px-obalovy-material/" target="_blank" class="btn-detail">
-          Zobrazit detail <span class="arr">→</span>
-        </a>
-      </div>
-    </div>
-
-    <!-- 3. Rychlost expedice -->
-    <div class="dash-card">
-      <div class="dash-card-bar"></div>
-      <div class="dash-card-body">
-        <div class="dash-card-head">
-          <div class="dash-icon">📊</div>
-          <div>
-            <div class="dash-title">Rychlost expedice</div>
-            <div class="dash-subtitle">4PX KPI · měsíční přehled</div>
-          </div>
-        </div>
-        <div class="dash-desc">
-          Jak rychle expedujeme objednávky zákazníkům. Plnění SLA cílů, průměrná doba zpracování a historický vývoj po měsících.
-        </div>
-        <div class="dash-numbers">
-          <span class="num-chip"><span class="dot g"></span>Březen 100 % KPI ✅</span>
-          <span class="num-chip"><span class="dot b"></span>Průměr 14,8 h zprac.</span>
-          <span class="num-chip"><span class="dot a"></span>Prosinec byl nejhorší</span>
-        </div>
-        <a href="https://rkonfal.github.io/4px-kpi-dashboard/" target="_blank" class="btn-detail">
-          Zobrazit detail <span class="arr">→</span>
-        </a>
-      </div>
-    </div>
-
-    <!-- 4. Náklady na přepravu -->
-    <div class="dash-card">
-      <div class="dash-card-bar"></div>
-      <div class="dash-card-body">
-        <div class="dash-card-head">
-          <div class="dash-icon">🚚</div>
-          <div>
-            <div class="dash-title">Náklady na přepravu</div>
-            <div class="dash-subtitle">4PX přepravci · Q1 2026</div>
-          </div>
-        </div>
-        <div class="dash-desc">
-          Kolik platíme přepravcům za každý balík. Srovnání Česká pošta vs. Packeta — kdo je levnější a proč na výběru záleží.
-        </div>
-        <div class="dash-numbers">
-          <span class="num-chip"><span class="dot g"></span>ČP 47,84 Kč/ks</span>
-          <span class="num-chip"><span class="dot r"></span>Packeta 94,83 Kč/ks</span>
-          <span class="num-chip"><span class="dot b"></span>Celkem 2,4 M Kč/Q1</span>
-        </div>
-        <a href="https://rkonfal.github.io/4px-carriers/" target="_blank" class="btn-detail">
-          Zobrazit detail <span class="arr">→</span>
-        </a>
-      </div>
-    </div>
-
-    <!-- 5. E-shop prodeje -->
-    <div class="dash-card">
-      <div class="dash-card-bar"></div>
-      <div class="dash-card-body">
-        <div class="dash-card-head">
-          <div class="dash-icon">🛒</div>
-          <div>
-            <div class="dash-title">E-shop prodeje</div>
-            <div class="dash-subtitle">WPJ Shop API · Q1 2026</div>
-          </div>
-        </div>
-        <div class="dash-desc">
-          Co se prodává a kdo nakupuje. TOP produkty, počty objednávek a způsoby plateb — přehled chování zákazníků.
-        </div>
-        <div class="dash-numbers">
-          <span class="num-chip"><span class="dot g"></span>33 K objednávek</span>
-          <span class="num-chip"><span class="dot p"></span>TOP: Fytogel Slaviton</span>
-          <span class="num-chip"><span class="dot b"></span>53 % platí online</span>
-        </div>
-        <a href="https://rkonfal.github.io/eshop-dashboard/" target="_blank" class="btn-detail">
-          Zobrazit detail <span class="arr">→</span>
-        </a>
-      </div>
-    </div>
-
-    <!-- 6. Přehled skladu -->
-    <div class="dash-card">
-      <div class="dash-card-bar"></div>
-      <div class="dash-card-body">
-        <div class="dash-card-head">
-          <div class="dash-icon">📋</div>
-          <div>
-            <div class="dash-title">Přehled skladu</div>
-            <div class="dash-subtitle">WPJ Shop · stav k 07.04.2026</div>
-          </div>
-        </div>
-        <div class="dash-desc">
-          Co máme na skladě a za kolik. Celková hodnota 29,1 M Kč, mrtvé zásoby a produkty, které je potřeba doplnit.
-        </div>
-        <div class="dash-numbers">
-          <span class="num-chip"><span class="dot p"></span>29,1 M Kč celkem</span>
-          <span class="num-chip"><span class="dot r"></span>⚠ 415 mrtvých položek</span>
-          <span class="num-chip"><span class="dot g"></span>1 740 produktů skladem</span>
-        </div>
-        <a href="https://rkonfal.github.io/inventory-dashboard/" target="_blank" class="btn-detail">
-          Zobrazit detail <span class="arr">→</span>
-        </a>
-      </div>
-    </div>
-
-  </div>
-
-  <!-- ═══ VAROVÁNÍ ═══ -->
-  <div class="block-label">Na co si dát pozor &nbsp;·&nbsp; Vyžaduje rozhodnutí</div>
-
-  <div class="alert-card">
-    <div class="alert-card-bar"></div>
-    <div class="alert-card-body">
-      <div class="alert-head">
-        <div class="alert-icon">⚠️</div>
+  <!-- Top bar -->
+  <header class="sticky top-0 z-20 bg-white/80 dark:bg-gray-900/80 backdrop-blur border-b border-gray-200 dark:border-gray-800">
+    <div class="flex items-center justify-between px-6 py-3.5">
+      <div class="flex items-center gap-4">
+        <!-- Hamburger -->
+        <button onclick="toggleSidebar()" class="lg:hidden p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path d="M4 6h16M4 12h16M4 18h16"/>
+          </svg>
+        </button>
         <div>
-          <div class="alert-title">Aktuální varování a doporučení</div>
-          <div class="alert-subtitle">4 body, které management by měl řešit teď</div>
+          <h1 class="text-xl font-bold text-gray-900 dark:text-white">Přehled portálu</h1>
+          <p class="text-xs text-gray-500 dark:text-gray-400">Aktualizováno: <span id="updateTime"></span></p>
         </div>
       </div>
-      <div class="alert-list">
-
-        <div class="alert-item red">
-          <div class="alert-emoji">📦</div>
-          <div>
-            <div class="alert-msg">M krabice dojdou za ~8 týdnů — objednat!</div>
-            <div class="alert-detail">Při tempu 2 662 zásilek/týden vyčerpáme zásoby středních krabic přibližně v červnu 2026. Pokud sezóna zrychlí, může být zásoby i dřív.</div>
-            <div class="alert-cta">→ Akce: Spustit objednávku M krabic co nejdříve</div>
-          </div>
-        </div>
-
-        <div class="alert-item red">
-          <div class="alert-emoji">💸</div>
-          <div>
-            <div class="alert-msg">Kurzové ztráty 1,3 M Kč v březnu — neobvyklé, prověřit</div>
-            <div class="alert-detail">Březnový zisk byl znatelně nižší kvůli kurzovým rozdílům. Takto vysoká ztráta není standard — zjistit, jde-li o jednorázový efekt nebo opakující se riziko.</div>
-            <div class="alert-cta">→ Akce: Ověřit s účetní — přechodný, nebo strukturální problém?</div>
-          </div>
-        </div>
-
-        <div class="alert-item amber">
-          <div class="alert-emoji">🚚</div>
-          <div>
-            <div class="alert-msg">Packeta zdražila 2× (63 → 126 Kč/ks) — vyjednat lepší podmínky?</div>
-            <div class="alert-detail">Cena zásilky přes Packetu se zdvojnásobila. Česká pošta zůstala na 47,84 Kč/ks. Přesun části zásilek na ČP může ušetřit stovky tisíc Kč ročně.</div>
-            <div class="alert-cta">→ Akce: Přehodnotit mix přepravců, kontaktovat Packetu ohledně slev</div>
-          </div>
-        </div>
-
-        <div class="alert-item amber">
-          <div class="alert-emoji">📅</div>
-          <div>
-            <div class="alert-msg">Prosinec měl nejhorší KPI (91 %) — připravit se na příští sezónu</div>
-            <div class="alert-detail">V prosinci 2025 expedice nesplnila SLA cíle. Vánoční sezóna znovu přijde — bez přípravy hrozí opakování a nespokojenost zákazníků.</div>
-            <div class="alert-cta">→ Akce: Naplánovat posílení skladu nejpozději do října 2026</div>
-          </div>
-        </div>
-
+      <div class="flex items-center gap-2">
+        <span class="hidden sm:inline-flex items-center gap-1.5 bg-green-50 dark:bg-green-900/30 text-green-700 dark:text-green-400 text-xs font-medium px-3 py-1.5 rounded-full border border-green-200 dark:border-green-800">
+          <span class="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></span>
+          Live data
+        </span>
+        <button onclick="toggleDark()" class="lg:hidden p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path d="M21 12.79A9 9 0 1111.21 3a7 7 0 009.79 9.79z"/>
+          </svg>
+        </button>
       </div>
     </div>
-  </div>
+  </header>
 
-  <!-- FOOTER -->
-  <div class="portal-footer">
-    Data aktualizována: duben 2026 &nbsp;·&nbsp; Zdroje: ABRA Flexi, WPJ Shop API, 4PX reporty &nbsp;·&nbsp; Diamond Plus s.r.o.
-  </div>
+  <!-- Content -->
+  <main class="flex-1 px-4 sm:px-6 py-6 space-y-6 max-w-[1400px] w-full mx-auto">
 
-</div><!-- /main -->
+    <!-- ── KPI CARDS ──────────────────────────────────────────────────── -->
+    <section>
+      <h2 class="text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-3">Klíčové ukazatele &middot; březen 2025</h2>
+      <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
 
+        <!-- KPI 1: Tržby -->
+        <div class="kpi-card bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 p-5">
+          <div class="flex items-start justify-between mb-3">
+            <div class="w-10 h-10 rounded-xl flex items-center justify-center" style="background:#F9F0F9;">
+              <svg class="w-5 h-5" style="color:#4A154B" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
+            </div>
+            <span class="inline-flex items-center gap-1 bg-green-50 dark:bg-green-900/30 text-green-700 dark:text-green-400 text-xs font-semibold px-2 py-1 rounded-full">
+              <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="18 15 12 9 6 15"/></svg>
+              +11%
+            </span>
+          </div>
+          <div class="text-2xl font-bold text-gray-900 dark:text-white">16,1 mil. Kč</div>
+          <div class="text-sm text-gray-500 dark:text-gray-400 mt-1">Tržby aktuální měsíc</div>
+          <div class="text-xs text-gray-400 dark:text-gray-500 mt-2">vs. předchozí měsíc</div>
+        </div>
+
+        <!-- KPI 2: Čistý zisk -->
+        <div class="kpi-card bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 p-5">
+          <div class="flex items-start justify-between mb-3">
+            <div class="w-10 h-10 rounded-xl flex items-center justify-center bg-emerald-50 dark:bg-emerald-900/20">
+              <svg class="w-5 h-5 text-emerald-600 dark:text-emerald-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+            </div>
+            <span class="inline-flex items-center gap-1 bg-green-50 dark:bg-green-900/30 text-green-700 dark:text-green-400 text-xs font-semibold px-2 py-1 rounded-full">
+              <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="18 15 12 9 6 15"/></svg>
+              +77%
+            </span>
+          </div>
+          <div class="text-2xl font-bold text-gray-900 dark:text-white">1,6 mil. Kč</div>
+          <div class="text-sm text-gray-500 dark:text-gray-400 mt-1">Čistý zisk</div>
+          <div class="text-xs text-gray-400 dark:text-gray-500 mt-2">nejlepší měsíc Q1</div>
+        </div>
+
+        <!-- KPI 3: Sklad -->
+        <div class="kpi-card bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 p-5">
+          <div class="flex items-start justify-between mb-3">
+            <div class="w-10 h-10 rounded-xl flex items-center justify-center bg-amber-50 dark:bg-amber-900/20">
+              <svg class="w-5 h-5 text-amber-600 dark:text-amber-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20 7H4a2 2 0 00-2 2v10a2 2 0 002 2h16a2 2 0 002-2V9a2 2 0 00-2-2z"/><path d="M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2"/></svg>
+            </div>
+            <span class="text-xs text-gray-500 dark:text-gray-400 font-medium bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded-full">5 skladů</span>
+          </div>
+          <div class="text-2xl font-bold text-gray-900 dark:text-white">29,1 mil. Kč</div>
+          <div class="text-sm text-gray-500 dark:text-gray-400 mt-1">Skladové zásoby</div>
+          <div class="text-xs text-gray-400 dark:text-gray-500 mt-2">1 740 produktů celkem</div>
+        </div>
+
+        <!-- KPI 4: Zásilky -->
+        <div class="kpi-card bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 p-5">
+          <div class="flex items-start justify-between mb-3">
+            <div class="w-10 h-10 rounded-xl flex items-center justify-center bg-blue-50 dark:bg-blue-900/20">
+              <svg class="w-5 h-5 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M1 3h15v13H1z"/><path d="M16 8h4l3 3v5h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+            </div>
+            <span class="text-xs text-gray-500 dark:text-gray-400 font-medium bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded-full">průměr</span>
+          </div>
+          <div class="text-2xl font-bold text-gray-900 dark:text-white">~2 666 ks</div>
+          <div class="text-sm text-gray-500 dark:text-gray-400 mt-1">Zásilky tento týden</div>
+          <div class="text-xs text-gray-400 dark:text-gray-500 mt-2">Q1: 103K objednávek</div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ── MODULE CARDS ───────────────────────────────────────────────── -->
+    <section>
+      <h2 class="text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-3">Přehled modulů</h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+
+        <!-- 1. Hospodaření -->
+        <a href="https://rkonfal.github.io/diamond-plus-report/" target="_blank"
+          class="card-hover bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 p-5 flex flex-col gap-3 group cursor-pointer no-underline" style="text-decoration:none;">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl flex items-center justify-center text-xl" style="background:#F9F0F9;">💰</div>
+            <div>
+              <div class="font-semibold text-gray-900 dark:text-white text-sm group-hover:text-[#4A154B] dark:group-hover:text-purple-300 transition">Hospodaření firmy</div>
+              <div class="text-xs text-gray-400 dark:text-gray-500">Kolik vyděláváme a kde utrácíme</div>
+            </div>
+            <svg class="w-4 h-4 text-gray-300 dark:text-gray-600 group-hover:text-[#4A154B] dark:group-hover:text-purple-400 ml-auto flex-shrink-0 transition" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+          </div>
+          <div class="flex gap-3">
+            <div class="flex-1 bg-gray-50 dark:bg-gray-700/50 rounded-xl p-3 text-center">
+              <div class="text-base font-bold text-gray-900 dark:text-white">16,1M</div>
+              <div class="text-[10px] text-gray-400 uppercase tracking-wide mt-0.5">Tržby</div>
+            </div>
+            <div class="flex-1 bg-gray-50 dark:bg-gray-700/50 rounded-xl p-3 text-center">
+              <div class="text-base font-bold text-emerald-600 dark:text-emerald-400">1,6M</div>
+              <div class="text-[10px] text-gray-400 uppercase tracking-wide mt-0.5">Zisk</div>
+            </div>
+            <div class="flex-1 bg-gray-50 dark:bg-gray-700/50 rounded-xl p-3 text-center">
+              <div class="text-base font-bold text-gray-900 dark:text-white">19%</div>
+              <div class="text-[10px] text-gray-400 uppercase tracking-wide mt-0.5">Marže</div>
+            </div>
+          </div>
+        </a>
+
+        <!-- 2. Sklad — WARNING -->
+        <a href="https://rkonfal.github.io/inventory-dashboard/" target="_blank"
+          class="card-hover bg-white dark:bg-gray-800 rounded-2xl border border-amber-200 dark:border-amber-700/50 p-5 flex flex-col gap-3 group cursor-pointer" style="text-decoration:none;">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl flex items-center justify-center text-xl bg-amber-50 dark:bg-amber-900/20">📋</div>
+            <div>
+              <div class="font-semibold text-gray-900 dark:text-white text-sm group-hover:text-amber-600 transition">Sklad a produkty</div>
+              <div class="text-xs text-amber-600 dark:text-amber-400 font-medium">&#9888; Vyžaduje pozornost</div>
+            </div>
+            <svg class="w-4 h-4 text-gray-300 dark:text-gray-600 group-hover:text-amber-500 ml-auto flex-shrink-0 transition" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+          </div>
+          <div class="bg-amber-50 dark:bg-amber-900/20 rounded-xl p-3 text-xs text-amber-700 dark:text-amber-300 leading-relaxed border border-amber-100 dark:border-amber-800/50">
+            541 skrytých produktů za 3,6M Kč &middot; M krabice ~7 týdnů zásoby
+          </div>
+          <div class="flex gap-3">
+            <div class="flex-1 bg-gray-50 dark:bg-gray-700/50 rounded-xl p-3 text-center">
+              <div class="text-base font-bold text-gray-900 dark:text-white">29,1M</div>
+              <div class="text-[10px] text-gray-400 uppercase tracking-wide mt-0.5">Hodnota</div>
+            </div>
+            <div class="flex-1 bg-gray-50 dark:bg-gray-700/50 rounded-xl p-3 text-center">
+              <div class="text-base font-bold text-gray-900 dark:text-white">1 740</div>
+              <div class="text-[10px] text-gray-400 uppercase tracking-wide mt-0.5">Produktů</div>
+            </div>
+          </div>
+        </a>
+
+        <!-- 3. Expedice -->
+        <a href="https://rkonfal.github.io/4px-kpi-dashboard/" target="_blank"
+          class="card-hover bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 p-5 flex flex-col gap-3 group cursor-pointer" style="text-decoration:none;">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl flex items-center justify-center text-xl bg-blue-50 dark:bg-blue-900/20">🚚</div>
+            <div>
+              <div class="font-semibold text-gray-900 dark:text-white text-sm group-hover:text-blue-600 dark:group-hover:text-blue-400 transition">Expedice a přeprava</div>
+              <div class="text-xs text-gray-400 dark:text-gray-500">Dopravci a KPI</div>
+            </div>
+            <svg class="w-4 h-4 text-gray-300 dark:text-gray-600 group-hover:text-blue-500 ml-auto flex-shrink-0 transition" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+          </div>
+          <div class="bg-green-50 dark:bg-green-900/20 rounded-xl p-3 text-xs text-green-700 dark:text-green-300 leading-relaxed border border-green-100 dark:border-green-800/50">
+            &#10003; Březen 100% KPI splněno &middot; ČP 47,84 Kč/ks
+          </div>
+          <div class="flex gap-3">
+            <div class="flex-1 bg-gray-50 dark:bg-gray-700/50 rounded-xl p-3 text-center">
+              <div class="text-base font-bold text-gray-900 dark:text-white">103K</div>
+              <div class="text-[10px] text-gray-400 uppercase tracking-wide mt-0.5">Objednávky</div>
+            </div>
+            <div class="flex-1 bg-gray-50 dark:bg-gray-700/50 rounded-xl p-3 text-center">
+              <div class="text-base font-bold text-gray-900 dark:text-white">2,4M</div>
+              <div class="text-[10px] text-gray-400 uppercase tracking-wide mt-0.5">Náklady Q1</div>
+            </div>
+          </div>
+        </a>
+
+        <!-- 4. E-shop -->
+        <a href="https://rkonfal.github.io/eshop-dashboard/" target="_blank"
+          class="card-hover bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 p-5 flex flex-col gap-3 group cursor-pointer" style="text-decoration:none;">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl flex items-center justify-center text-xl" style="background:#F9F0F9;">🛒</div>
+            <div>
+              <div class="font-semibold text-gray-900 dark:text-white text-sm group-hover:text-[#4A154B] dark:group-hover:text-purple-300 transition">E-shop prodeje</div>
+              <div class="text-xs text-gray-400 dark:text-gray-500">Objednávky a tržby</div>
+            </div>
+            <svg class="w-4 h-4 text-gray-300 dark:text-gray-600 group-hover:text-[#4A154B] ml-auto flex-shrink-0 transition" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+          </div>
+          <div class="bg-purple-50 dark:bg-purple-900/20 rounded-xl p-3 text-xs text-purple-700 dark:text-purple-300 leading-relaxed border border-purple-100 dark:border-purple-800/50">
+            33K objednávek &middot; TOP: Fytogel Slaviton &middot; průměr 1 457 Kč
+          </div>
+          <div class="flex gap-3">
+            <div class="flex-1 bg-gray-50 dark:bg-gray-700/50 rounded-xl p-3 text-center">
+              <div class="text-base font-bold text-gray-900 dark:text-white">48,1M</div>
+              <div class="text-[10px] text-gray-400 uppercase tracking-wide mt-0.5">Tržby</div>
+            </div>
+            <div class="flex-1 bg-gray-50 dark:bg-gray-700/50 rounded-xl p-3 text-center">
+              <div class="text-base font-bold text-gray-900 dark:text-white">1 457 Kč</div>
+              <div class="text-[10px] text-gray-400 uppercase tracking-wide mt-0.5">Průměr</div>
+            </div>
+          </div>
+        </a>
+
+        <!-- 5. Balíčky -->
+        <a href="https://rkonfal.github.io/balicky-dashboard/" target="_blank"
+          class="card-hover bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 p-5 flex flex-col gap-3 group cursor-pointer" style="text-decoration:none;">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl flex items-center justify-center text-xl bg-indigo-50 dark:bg-indigo-900/20">📦</div>
+            <div>
+              <div class="font-semibold text-gray-900 dark:text-white text-sm group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition">Balíčky</div>
+              <div class="text-xs text-gray-400 dark:text-gray-500">Produktové sety</div>
+            </div>
+            <svg class="w-4 h-4 text-gray-300 dark:text-gray-600 group-hover:text-indigo-500 ml-auto flex-shrink-0 transition" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+          </div>
+          <div class="flex gap-3">
+            <div class="flex-1 bg-gray-50 dark:bg-gray-700/50 rounded-xl p-3 text-center">
+              <div class="text-base font-bold text-gray-900 dark:text-white">129</div>
+              <div class="text-[10px] text-gray-400 uppercase tracking-wide mt-0.5">Balíčků</div>
+            </div>
+            <div class="flex-1 bg-gray-50 dark:bg-gray-700/50 rounded-xl p-3 text-center">
+              <div class="text-base font-bold text-gray-900 dark:text-white">1 733</div>
+              <div class="text-[10px] text-gray-400 uppercase tracking-wide mt-0.5">Prodáno ks</div>
+            </div>
+          </div>
+          <div class="text-xs text-gray-400 dark:text-gray-500">TOP: 52902/03 — 603 ks</div>
+        </a>
+
+        <!-- 6. Expirace — WARNING -->
+        <a href="https://rkonfal.github.io/expirace-dashboard/" target="_blank"
+          class="card-hover bg-white dark:bg-gray-800 rounded-2xl border border-red-200 dark:border-red-700/50 p-5 flex flex-col gap-3 group cursor-pointer" style="text-decoration:none;">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl flex items-center justify-center text-xl bg-red-50 dark:bg-red-900/20">&#9200;</div>
+            <div>
+              <div class="font-semibold text-gray-900 dark:text-white text-sm group-hover:text-red-600 dark:group-hover:text-red-400 transition">Expirace</div>
+              <div class="text-xs text-red-500 dark:text-red-400 font-medium">&#9888; Kritické položky!</div>
+            </div>
+            <svg class="w-4 h-4 text-gray-300 dark:text-gray-600 group-hover:text-red-500 ml-auto flex-shrink-0 transition" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+          </div>
+          <div class="bg-red-50 dark:bg-red-900/20 rounded-xl p-3 text-xs text-red-700 dark:text-red-300 leading-relaxed border border-red-100 dark:border-red-800/50">
+            Peeling Broskvový 6 445 ks &mdash; expirace 8.5.! Jednat ihned.
+          </div>
+          <div class="flex gap-3">
+            <div class="flex-1 bg-red-50 dark:bg-red-900/30 rounded-xl p-3 text-center">
+              <div class="text-base font-bold text-red-600 dark:text-red-400">2</div>
+              <div class="text-[10px] text-red-400 uppercase tracking-wide mt-0.5">Kritické</div>
+            </div>
+            <div class="flex-1 bg-amber-50 dark:bg-amber-900/20 rounded-xl p-3 text-center">
+              <div class="text-base font-bold text-amber-600 dark:text-amber-400">24</div>
+              <div class="text-[10px] text-amber-500 uppercase tracking-wide mt-0.5">Varování</div>
+            </div>
+          </div>
+        </a>
+
+      </div>
+    </section>
+
+    <!-- ── BOTTOM ROW: AI Alerts + Quick Links ────────────────────────── -->
+    <section class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+
+      <!-- AI Doporučení (spans 2 cols) -->
+      <div class="lg:col-span-2 bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 p-5">
+        <div class="flex items-center gap-2 mb-4">
+          <div class="w-8 h-8 rounded-lg flex items-center justify-center text-base" style="background:#F9F0F9;">&#129302;</div>
+          <div>
+            <div class="font-semibold text-gray-900 dark:text-white text-sm">AI Doporučení</div>
+            <div class="text-xs text-gray-400 dark:text-gray-500">Automaticky generované přehledy</div>
+          </div>
+        </div>
+
+        <div class="space-y-1">
+
+          <div class="alert-item flex items-start gap-3 p-3 cursor-default">
+            <span class="text-amber-500 text-base mt-0.5 flex-shrink-0">&#9888;&#65039;</span>
+            <div class="flex-1 min-w-0">
+              <div class="text-sm font-medium text-gray-800 dark:text-gray-200">M krabice dojdou za ~7 týdnů</div>
+              <div class="text-xs text-gray-400 dark:text-gray-500 mt-0.5">Zásoby obalů jsou kriticky nízké. Doporučujeme objednat co nejdříve.</div>
+            </div>
+            <span class="flex-shrink-0 text-xs font-semibold bg-amber-100 dark:bg-amber-900/40 text-amber-700 dark:text-amber-300 px-2.5 py-1 rounded-full">Objednat!</span>
+          </div>
+
+          <div class="alert-item flex items-start gap-3 p-3 cursor-default">
+            <span class="text-red-500 text-base mt-0.5 flex-shrink-0">&#9888;&#65039;</span>
+            <div class="flex-1 min-w-0">
+              <div class="text-sm font-medium text-gray-800 dark:text-gray-200">Peeling Broskvový &mdash; 6 445 ks expiruje 8.5.</div>
+              <div class="text-xs text-gray-400 dark:text-gray-500 mt-0.5">Kritická expirace. Navrhujeme okamžitou akci &mdash; slevu nebo výprodej.</div>
+            </div>
+            <span class="flex-shrink-0 text-xs font-semibold bg-red-100 dark:bg-red-900/40 text-red-700 dark:text-red-300 px-2.5 py-1 rounded-full">Sleva!</span>
+          </div>
+
+          <div class="alert-item flex items-start gap-3 p-3 cursor-default">
+            <span class="text-orange-500 text-base mt-0.5 flex-shrink-0">&#9888;&#65039;</span>
+            <div class="flex-1 min-w-0">
+              <div class="text-sm font-medium text-gray-800 dark:text-gray-200">541 skrytých produktů za 3,6M Kč</div>
+              <div class="text-xs text-gray-400 dark:text-gray-500 mt-0.5">Produkty negenerují tržby. Doporučujeme prodej nebo odpis.</div>
+            </div>
+            <span class="flex-shrink-0 text-xs font-semibold bg-orange-100 dark:bg-orange-900/40 text-orange-700 dark:text-orange-300 px-2.5 py-1 rounded-full">Prodat / Odpsat</span>
+          </div>
+
+          <div class="alert-item flex items-start gap-3 p-3 cursor-default">
+            <span class="text-green-500 text-base mt-0.5 flex-shrink-0">&#9989;</span>
+            <div class="flex-1 min-w-0">
+              <div class="text-sm font-medium text-gray-800 dark:text-gray-200">Březen: zisk 1,6M Kč (+77%)</div>
+              <div class="text-xs text-gray-400 dark:text-gray-500 mt-0.5">Nejlepší měsíc Q1. Hospodaření se zlepšuje meziměsíčně.</div>
+            </div>
+            <span class="flex-shrink-0 text-xs font-semibold bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-300 px-2.5 py-1 rounded-full">Skvělé!</span>
+          </div>
+
+          <div class="alert-item flex items-start gap-3 p-3 cursor-default">
+            <span class="text-blue-500 text-base mt-0.5 flex-shrink-0">&#128161;</span>
+            <div class="flex-1 min-w-0">
+              <div class="text-sm font-medium text-gray-800 dark:text-gray-200">Packeta zdražila 2&times; (63 &rarr; 126 Kč/ks)</div>
+              <div class="text-xs text-gray-400 dark:text-gray-500 mt-0.5">Výrazný nárůst nákladů na dopravu. Doporučujeme vyjednat nové podmínky.</div>
+            </div>
+            <span class="flex-shrink-0 text-xs font-semibold bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 px-2.5 py-1 rounded-full">Vyjednat</span>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Quick Links -->
+      <div class="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 p-5">
+        <div class="font-semibold text-gray-900 dark:text-white text-sm mb-4">Rychlý přístup</div>
+        <div class="space-y-1">
+          <a href="https://rkonfal.github.io/diamond-plus-report/" target="_blank" style="text-decoration:none;"
+            class="flex items-center gap-3 p-3 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700/50 transition group">
+            <span class="text-base">💰</span>
+            <span class="text-sm text-gray-700 dark:text-gray-300 group-hover:text-[#4A154B] dark:group-hover:text-purple-300 transition font-medium">Hospodaření</span>
+            <svg class="w-3.5 h-3.5 text-gray-300 ml-auto flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
+          </a>
+          <a href="https://rkonfal.github.io/inventory-dashboard/" target="_blank" style="text-decoration:none;"
+            class="flex items-center gap-3 p-3 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700/50 transition group">
+            <span class="text-base">📋</span>
+            <span class="text-sm text-gray-700 dark:text-gray-300 group-hover:text-amber-600 transition font-medium">Sklad</span>
+            <span class="ml-auto text-[10px] font-semibold bg-amber-100 text-amber-600 dark:bg-amber-900/30 dark:text-amber-400 px-1.5 py-0.5 rounded flex-shrink-0">!</span>
+          </a>
+          <a href="https://rkonfal.github.io/4px-kpi-dashboard/" target="_blank" style="text-decoration:none;"
+            class="flex items-center gap-3 p-3 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700/50 transition group">
+            <span class="text-base">🚚</span>
+            <span class="text-sm text-gray-700 dark:text-gray-300 group-hover:text-blue-600 transition font-medium">Expedice</span>
+            <svg class="w-3.5 h-3.5 text-gray-300 ml-auto flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
+          </a>
+          <a href="https://rkonfal.github.io/4px-carriers/" target="_blank" style="text-decoration:none;"
+            class="flex items-center gap-3 p-3 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700/50 transition group">
+            <span class="text-base">🚛</span>
+            <span class="text-sm text-gray-700 dark:text-gray-300 group-hover:text-blue-600 transition font-medium">Přepravci</span>
+            <svg class="w-3.5 h-3.5 text-gray-300 ml-auto flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
+          </a>
+          <a href="https://rkonfal.github.io/eshop-dashboard/" target="_blank" style="text-decoration:none;"
+            class="flex items-center gap-3 p-3 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700/50 transition group">
+            <span class="text-base">🛒</span>
+            <span class="text-sm text-gray-700 dark:text-gray-300 group-hover:text-[#4A154B] dark:group-hover:text-purple-300 transition font-medium">E-shop</span>
+            <svg class="w-3.5 h-3.5 text-gray-300 ml-auto flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
+          </a>
+          <a href="https://rkonfal.github.io/4px-obalovy-material/" target="_blank" style="text-decoration:none;"
+            class="flex items-center gap-3 p-3 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700/50 transition group">
+            <span class="text-base">📦</span>
+            <span class="text-sm text-gray-700 dark:text-gray-300 group-hover:text-indigo-600 transition font-medium">Obaly</span>
+            <svg class="w-3.5 h-3.5 text-gray-300 ml-auto flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
+          </a>
+          <a href="https://rkonfal.github.io/balicky-dashboard/" target="_blank" style="text-decoration:none;"
+            class="flex items-center gap-3 p-3 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700/50 transition group">
+            <span class="text-base">🎁</span>
+            <span class="text-sm text-gray-700 dark:text-gray-300 group-hover:text-indigo-600 transition font-medium">Balíčky</span>
+            <svg class="w-3.5 h-3.5 text-gray-300 ml-auto flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
+          </a>
+          <a href="https://rkonfal.github.io/skupiny-dashboard/" target="_blank" style="text-decoration:none;"
+            class="flex items-center gap-3 p-3 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700/50 transition group">
+            <span class="text-base">👥</span>
+            <span class="text-sm text-gray-700 dark:text-gray-300 group-hover:text-[#4A154B] dark:group-hover:text-purple-300 transition font-medium">Skupiny</span>
+            <svg class="w-3.5 h-3.5 text-gray-300 ml-auto flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
+          </a>
+          <a href="https://rkonfal.github.io/expirace-dashboard/" target="_blank" style="text-decoration:none;"
+            class="flex items-center gap-3 p-3 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700/50 transition group">
+            <span class="text-base">⏰</span>
+            <span class="text-sm text-gray-700 dark:text-gray-300 group-hover:text-red-600 transition font-medium">Expirace</span>
+            <span class="ml-auto text-[10px] font-semibold bg-red-100 text-red-600 dark:bg-red-900/30 dark:text-red-400 px-1.5 py-0.5 rounded flex-shrink-0">2!</span>
+          </a>
+        </div>
+      </div>
+
+    </section>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="px-6 py-4 text-center border-t border-gray-200 dark:border-gray-800">
+    <p class="text-xs text-gray-400 dark:text-gray-600">Diamond Plus Business Portal &mdash; <span id="footerDate"></span></p>
+  </footer>
+</div>
+
+<!-- ── JS ──────────────────────────────────────────────────────────────── -->
 <script>
-function toggleTheme() {
-  const d = document.documentElement;
-  d.setAttribute('data-theme', d.getAttribute('data-theme') === 'dark' ? '' : 'dark');
-}
-function toggleSidebar() {
-  document.getElementById('sidebar').classList.toggle('open');
-  document.querySelector('.overlay').classList.toggle('show');
-}
-if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-  document.documentElement.setAttribute('data-theme', 'dark');
-}
+  // Current time
+  function setTime() {
+    const now = new Date();
+    const timeStr = now.toLocaleString('cs-CZ', {
+      day: '2-digit', month: '2-digit', year: 'numeric',
+      hour: '2-digit', minute: '2-digit'
+    }).replace(',', '');
+    document.getElementById('updateTime').textContent = 'Dnes ' + now.toLocaleTimeString('cs-CZ', { hour: '2-digit', minute: '2-digit' });
+    document.getElementById('footerDate').textContent = now.toLocaleDateString('cs-CZ', { day: '2-digit', month: 'long', year: 'numeric' });
+  }
+  setTime();
+
+  // Dark mode
+  function toggleDark() {
+    document.documentElement.classList.toggle('dark');
+    localStorage.setItem('dp_dark', document.documentElement.classList.contains('dark'));
+  }
+  if (localStorage.getItem('dp_dark') === 'true') {
+    document.documentElement.classList.add('dark');
+  }
+
+  // Sidebar (mobile)
+  var sidebarOpen = false;
+  function toggleSidebar() {
+    sidebarOpen = !sidebarOpen;
+    const s = document.getElementById('sidebar');
+    const o = document.getElementById('overlay');
+    if (sidebarOpen) {
+      s.style.transform = 'translateX(0)';
+      o.classList.remove('hidden');
+    } else {
+      s.style.transform = 'translateX(-100%)';
+      o.classList.add('hidden');
+    }
+  }
+  function closeSidebar() {
+    sidebarOpen = false;
+    document.getElementById('sidebar').style.transform = 'translateX(-100%)';
+    document.getElementById('overlay').classList.add('hidden');
+  }
+  function initSidebar() {
+    const s = document.getElementById('sidebar');
+    if (window.innerWidth < 1024) {
+      s.style.transform = 'translateX(-100%)';
+      sidebarOpen = false;
+    } else {
+      s.style.transform = '';
+    }
+  }
+  initSidebar();
+  window.addEventListener('resize', initSidebar);
 </script>
+
 </body>
 </html>
